@@ -278,7 +278,7 @@ button.blk:active:not(:disabled){transform:translate(4px,4px);box-shadow:inset 4
 @keyframes burst{to{transform:translate(var(--dx),var(--dy));opacity:0}}
 .floater{position:fixed;z-index:46;pointer-events:none;font-family:var(--body);font-weight:700;font-size:32px;color:var(--gold-hi);text-shadow:3px 3px 0 var(--edge);transform:translateX(-50%);animation:floatUp 1s steps(8) forwards}
 @keyframes floatUp{to{transform:translate(-50%,-70px);opacity:0}}
-.toast{position:fixed;left:50%;bottom:calc(22px + env(safe-area-inset-bottom,0px));transform:translate(-50%,200%);background:var(--purple-d);color:#fff;border:4px solid var(--edge);box-shadow:6px 6px 0 var(--edge);padding:10px 16px;font-family:var(--body);font-weight:700;font-size:17px;line-height:1.35;transition:transform .3s steps(4);z-index:42;max-width:90vw;text-align:center}
+.toast{position:fixed;left:50%;top:calc(66px + env(safe-area-inset-top,0px));transform:translate(-50%,-300%);background:var(--purple-d);color:#fff;border:4px solid var(--edge);box-shadow:6px 6px 0 var(--edge);padding:10px 16px;font-family:var(--body);font-weight:700;font-size:17px;line-height:1.35;transition:transform .3s steps(4);z-index:42;max-width:90vw;text-align:center}
 .toast.on{transform:translate(-50%,0)}
 #snd{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));right:10px;z-index:43;width:44px;height:44px;background:var(--surface);font-size:20px;padding:0}
 
@@ -359,6 +359,36 @@ body.wide #s-map .hud{max-width:640px;margin:0 auto}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:6px}
 .seg button{padding:9px 6px;border:3px solid var(--edge);background:var(--surface2);color:var(--text);font-family:var(--label);font-size:19px}
 .seg button.on{background:var(--gold);color:var(--on-gold)}
+
+#chardet{position:fixed;inset:0;z-index:48;display:none;place-items:center;background:rgba(10,3,25,.82);padding:16px;overflow:auto}
+#chardet.on{display:grid}
+.cd-card{background:var(--surface);max-width:400px;width:100%;padding:16px;text-align:center;animation:pop .35s steps(4)}
+#cd-img{display:block;width:min(70vw,260px);height:auto;margin:0 auto;border:4px solid var(--gold);box-shadow:6px 6px 0 var(--edge)}
+.cd-name{font-family:var(--pixel);font-size:22px;color:var(--gold);text-shadow:3px 3px 0 var(--edge);margin-top:16px}
+.cd-sk{font-family:var(--label);font-size:24px;color:var(--purple);margin-top:10px}
+.cd-desc{margin:6px 0 4px;font-size:17px;line-height:1.45}
+.cd-rule{margin:0 0 12px;font-size:14px;color:var(--muted)}
+#chardet .cta{margin-top:6px}
+.help.sp em img{display:block;margin:0 auto;width:26px;height:26px;border-width:2px}
+.help.sp{background:color-mix(in srgb,var(--gold) 28%,var(--surface2))}
+.spchip{cursor:pointer;background:var(--gold);color:var(--on-gold)}
+.spchip:disabled{opacity:.45;cursor:default;background:var(--surface2);color:var(--text)}
+.pzb{position:absolute;top:-14px;right:-14px;font-size:20px;filter:drop-shadow(2px 2px 0 rgba(0,0,0,.5))}
+#skillfx{position:fixed;inset:0;z-index:51;display:none;place-items:center;pointer-events:auto;background:radial-gradient(circle,rgba(0,0,0,.35),rgba(0,0,0,.6))}
+#skillfx.on{display:grid}
+.sk-wrap{position:relative;display:flex;flex-direction:column;align-items:center}
+.sk-card{position:relative;display:flex;align-items:center;gap:14px;padding:14px 22px 14px 14px;background:linear-gradient(135deg,var(--c1),var(--c2));
+  border:5px solid #05010d;box-shadow:inset 4px 4px 0 rgba(255,255,255,.35),inset -4px -4px 0 rgba(0,0,0,.25);animation:skIn .55s steps(6) both,skBob 1s ease-in-out .55s infinite;max-width:92vw;overflow:hidden}
+.sk-card::after{content:"";position:absolute;top:-30%;bottom:-30%;left:-50%;width:30%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.65),transparent);transform:skewX(-20deg);animation:glint 1.1s ease-in-out .3s infinite}
+.sk-card img{display:block;width:76px;height:76px;border:4px solid #05010d}
+.sk-top{font-family:var(--label);font-size:22px;color:#fff;text-shadow:2px 2px 0 #05010d;letter-spacing:.04em}
+.sk-name{font-family:var(--pixel);font-size:clamp(15px,4.6vw,22px);color:#fff7c2;text-shadow:3px 3px 0 #05010d;margin-top:6px;line-height:1.3}
+.sk-shadow{width:80%;height:22px;margin-top:14px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.65),transparent 70%);animation:skShadow 1s ease-in-out .55s infinite}
+@keyframes skIn{0%{transform:scale(2.6) rotate(-10deg);opacity:0}65%{transform:scale(.9) rotate(2deg);opacity:1}100%{transform:scale(1)}}
+@keyframes skBob{50%{transform:translateY(-10px)}}
+@keyframes skShadow{50%{transform:scaleX(.82);opacity:.7}}
+#skillfx.out{animation:heroOut .3s steps(3) forwards}
+@media (prefers-reduced-motion:reduce){.sk-card,.sk-card::after,.sk-shadow{animation:none}}
 
 /* ---------- Legibilidade (fontes pixeladas) ---------- */
 body{font-synthesis:none;-webkit-font-smoothing:antialiased}
@@ -458,6 +488,7 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
     <ol>
       <li>Cada série é um mapa. Escolha seu caminho ponto a ponto.</li>
       <li>Os caminhos se cruzam e você só descobre o que tem em cada ponto quando chega nele. Dica: caminhos curtos costumam esconder perigos… e tesouros.</li>
+      <li>Cada personagem tem um <b>especial</b>: até 2 usos por jornada (o Gil tem 1), nunca 2 vezes na mesma série. Em cada pergunta dá para usar só um recurso: Pular, Dica ou o especial.</li>
       <li>Errou? Perde 1 vida e fica no mesmo ponto até acertar outra pergunta. Perdeu as 3, a jornada acaba.</li>
       <li>Alguns pontos valem prêmio, mas só se você acertar de primeira e sem usar ajuda. Prêmios são raros, principalmente nos primeiros anos.</li>
       <li>No fim do 5º e do 9º ano tem o boss: a megaprova de formatura, com uma pergunta de cada matéria. Vencendo, você escolhe um bônus.</li>
@@ -482,7 +513,7 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
 
 <section class="screen choose" id="s-dif">
   <div class="step">PASSO <span class="n">3</span> DE <span class="n">3</span></div>
-  <h2>Qual a força do vento?</h2>
+  <h2>Quantas perguntas por fase?</h2>
   <div id="difs"></div>
   <button class="back" onclick="go('s-recorte')">◀ Voltar</button>
 </section>
@@ -508,7 +539,7 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
   <div class="feedback" id="q-fb"></div>
   <div class="helps" id="q-helps">
     <button class="help blk" id="h-skip" onclick="useSkip()"><em>⏭️</em>PULAR<b id="c-skip"></b></button>
-    <button class="help blk" id="h-ask" onclick="useAsk()"><em>🧑‍🤝‍🧑</em>PERGUNTAR<b id="c-ask"></b></button>
+    <button class="help blk sp" id="h-sp" onclick="useSpecial()"><em id="sp-ic"></em><span id="sp-lb">ESPECIAL</span><b id="c-sp"></b></button>
     <button class="help blk" id="h-hint" onclick="useHint()"><em>💡</em>DICA<b id="c-hint"></b></button>
   </div>
 </section>
@@ -538,6 +569,16 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
 <div class="toast" id="toast"></div>
 <div id="flash"></div>
 <div id="reveal" aria-live="polite"></div>
+<div id="chardet" role="dialog" aria-label="Detalhes do personagem"><div class="cd-card blk">
+  <img id="cd-img" alt="">
+  <div class="cd-name" id="cd-name"></div>
+  <div class="cd-sk" id="cd-sk"></div>
+  <p class="cd-desc" id="cd-desc"></p>
+  <p class="cd-rule" id="cd-rule"></p>
+  <button class="cta blk" id="cd-ok">✔ CONFIRMAR</button>
+  <button class="back" onclick="closeCharDet()">◀ Escolher outro</button>
+</div></div>
+<div id="skillfx" aria-live="polite"></div>
 <div id="sharebox" role="dialog" aria-label="Compartilhar resultado"><div class="sb-card blk">
   <div class="sb-title">SEU RESULTADO</div>
   <img id="sb-img" alt="Imagem do resultado">
@@ -2077,12 +2118,12 @@ const RECORTES=[
  {name:"Caos do sexto ano",desc:"Começa no 6º ano",start:5,icon:"🌀"},
  {name:"Loucura de colegial",desc:"Ensino Médio e Mini ENEM",start:9,icon:"🔥"}];
 const DIFS=[
- {name:"Brisa",icon:"🍃",lens:[4,3,2],helps:{skip:2,ask:1,hint:1},hardW:.15,desc:"Mapas curtos e mais ajudas"},
- {name:"Ventania",icon:"🌪️",lens:[5,4,2],helps:{skip:1,ask:1,hint:1},hardW:.25,desc:"Mapas médios e 1 de cada ajuda"},
- {name:"Sopro do Lobo",icon:"🐺",lens:[6,4,3],helps:{skip:1,ask:0,hint:1},hardW:.35,desc:"Mapas longos, mais desafios e menos ajudas"}];
+ {name:"Rodada leve",icon:"☕",lens:[4,3,2],helps:{skip:1,hint:1},hardW:.25,desc:"Fases curtas: de 2 a 5 perguntas por série"},
+ {name:"Desafio normal",icon:"📚",lens:[5,4,3],helps:{skip:1,hint:1},hardW:.25,desc:"Fases médias: de 3 a 6 perguntas por série"},
+ {name:"Maratona intensa",icon:"🏃",lens:[7,5,4],helps:{skip:1,hint:1},hardW:.25,desc:"Fases longas: de 4 a 8 perguntas por série"}];
 const NODE={q:"?",hard:"💀",chest:"🎁",rare:"💎",event:"!",boss:"🎓",end:"🚩"};
 const NODENAME={q:"Pergunta",hard:"Desafio difícil",chest:"Recompensa",rare:"Baú lendário",event:"Evento",boss:"Boss",end:"Fim do ano"};
-const HELP={skip:["⏭️","Pular"],ask:["🧑‍🤝‍🧑","Perguntar a alguém"],hint:["💡","Dica"]};
+const HELP={skip:["⏭️","Pular"],hint:["💡","Dica"]};
 const MATES=[["🧒","Lia, a nerd da turma"],["🧑‍🦱","Beto, do fundão"],["👧","Duda, representante de sala"],["🧑‍🏫","Tio da cantina"],["👵","Vó, que já viu de tudo"]];
 const RH=104,TOP=100,Y=r=>TOP+r*RH+RH/2;
 
@@ -2359,7 +2400,7 @@ const base=()=>100+S.lvl*25;
 /* ---------- Setup ---------- */
 $("recortes").innerHTML=RECORTES.map((r,i)=>`<button class="opt blk" onclick="chooseRecorte(${i})"><span class="ic">${r.icon}</span><span><b>${r.name}</b><span>${r.desc}</span></span></button>`).join("");
 $("difs").innerHTML=DIFS.map((d,i)=>`<button class="opt blk" onclick="startGame(${i})"><span class="ic">${d.icon}</span><span><b>${d.name}</b><span>${d.desc}</span></span></button>`).join("");
-$("chars").innerHTML=CHARS.map((c,i)=>`<button class="charc blk" onclick="chooseChar(${i})">${portrait(c,170)}<b>${c.name}</b></button>`).join("");
+$("chars").innerHTML=CHARS.map((c,i)=>`<button class="charc blk" onclick="openCharDet(${i})">${portrait(c,170)}<b>${c.name}</b></button>`).join("");
 let hero=null;
 let choosing=false;
 function chooseChar(i){
@@ -2372,7 +2413,7 @@ function chooseChar(i){
   setTimeout(()=>{if(!timer&&!ended)wait(4000)},3000);
 }
 function showHero(c,onSkip){
-  const o=$("herofx");$("hf-img").src=IMGS[c.name].p;$("hf-name").textContent=c.name.toUpperCase();$("hf-tag").textContent="";
+  const o=$("herofx");$("hf-img").src=IMGS[c.name].p;$("hf-name").textContent=c.name.toUpperCase();$("hf-tag").textContent=SK[c.name].icon+" "+SK[c.name].name;
   o.classList.remove("out");o.classList.add("on");o.onclick=onSkip;
   /* reinicia as animações a cada seleção (alguns navegadores não reiniciam sozinhos) */
   ["hf-card","hf-glint","hf-name","hf-rays","hf-skip"].forEach(c=>{const el=o.querySelector("."+c);if(!el)return;el.style.animation="none";void el.offsetWidth;el.style.animation=""});
@@ -2395,7 +2436,7 @@ function chooseRecorte(i){recorte=RECORTES[i];go("s-dif")}
 
 function startGame(k){
   const d=DIFS[k];
-  STREAK=0;S={shield:0,mult:1,char:hero||CHARS[0],startLvl:recorte.start,dif:d,lvl:recorte.start,lives:3,help:{...d.helps},friend:false,score:0,right:0,wrong:0,used:{},lastSubj:null};
+  STREAK=0;S={sk:{left:SK[(hero||CHARS[0]).name].uses,lastLvl:-1},capLvl:-1,capLeft:0,ban:null,shield:0,mult:1,char:hero||CHARS[0],startLvl:recorte.start,dif:d,lvl:recorte.start,lives:3,help:{...d.helps},friend:false,score:0,right:0,wrong:0,used:{},lastSubj:null};
   genMap();sfx("level");flash("gold");
   const L=LEVELS[S.lvl];
   panel({iconHTML:portrait(S.char,150),title:S.char.name+" chegou "+AO(L)+"!",text:`${STAGES[L.stage].name}. Escolha seu caminho no mapa e chegue ao fim do ano com vida.`,buttons:[{label:"▶ ABRIR O MAPA",fn:toMap}]});
@@ -2412,7 +2453,8 @@ function pickQ(lid,subj){
   else{
     /* sorteia a matéria antes da pergunta: as cinco principais pesam 3x mais e evita repetir a anterior */
     const groups={};idx.forEach(i=>{const g=grp(pool[i][0]);(groups[g]=groups[g]||[]).push(i)});
-    let names=Object.keys(groups).filter(g=>g!==S.lastGrp);if(!names.length)names=Object.keys(groups);
+    const banned=g=>S.ban&&S.ban.lvl===S.lvl&&S.ban.g===g;
+    let names=Object.keys(groups).filter(g=>g!==S.lastGrp&&!banned(g));if(!names.length)names=Object.keys(groups).filter(g=>!banned(g));if(!names.length)names=Object.keys(groups);
     const w=g=>CORE.includes(g)?3:1;let r=Math.random()*names.reduce((t,g)=>t+w(g),0),g=names[0];
     for(const n of names){r-=w(n);if(r<=0){g=n;break}}
     idx=groups[g];
@@ -2523,7 +2565,7 @@ function renderMap(){
   $("m-year").innerHTML=nm(L.name);
   $("m-hearts").innerHTML=face(S.char,36)+"<span>"+hearts()+"</span>";
   $("m-score").textContent=pts(S.score);
-  $("m-inv").innerHTML=Object.keys(HELP).map(k=>`<span class="chip">${HELP[k][0]} ${S.help[k]}</span>`).join("")
+  $("m-inv").innerHTML=Object.keys(HELP).map(k=>`<span class="chip">${HELP[k][0]} ${S.help[k]}</span>`).join("")+(S.char.name==="Wallace"?`<button class="chip spchip" ${skReady()&&!M.revealed?"":"disabled"} onclick="useWallace()">🙏 Especial do Wallace · ${S.sk.left}</button>`:`<span class="chip">${SK[S.char.name].icon} Especial · ${S.sk.left}</span>`)
     +(S.shield?`<span class="chip">🛡️ ${S.shield}</span>`:"")+(S.mult>1?`<span class="chip">⭐ 2x pontos</span>`:"")+(S.friend?`<span class="chip">🤝 Amigo</span>`:"");
   const W=HORIZ?P(M.end).x+190:100, H=HORIZ?100:M.H;
   let svg="";
@@ -2536,9 +2578,9 @@ function renderMap(){
   let html=`<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">${svg}</svg>`;
   html+=`<div class="sign" style="${HORIZ?"top:12px;left:120px":"top:12px"}">INÍCIO ${nm(DO(L).toUpperCase())}</div>`;
   live.forEach(n=>{
-    const av=isAvail(n),big=n.type==="boss"||n.type==="end",known=n.done||big;
+    const av=isAvail(n),big=n.type==="boss"||n.type==="end",known=n.done||big||M.revealed;
     const cls=["node",known?"t-"+n.type:"t-unk",big?"big":"",av?"avail":"",n.id===S.pos?"":n.done?"done":av?"":"locked"].join(" ");
-    html+=`<button class="${cls}" style="${P(n).css}" ${av?`onclick="enter(${n.id})"`:"disabled"} aria-label="${known?NODENAME[n.type]:"Ponto desconhecido"}${av?", disponível":""}">${known?NODE[n.type]:"?"}</button>`;
+    html+=`<button class="${cls}" style="${P(n).css}" ${av?`onclick="enter(${n.id})"`:"disabled"} aria-label="${known?NODENAME[n.type]:"Ponto desconhecido"}${av?", disponível":""}">${known?NODE[n.type]:"?"}${M.revealed&&n.prize&&!n.done?'<span class="pzb">🎁</span>':""}</button>`;
   });
   const ep=P(M.end);
   html+=`<div class="sign" style="${HORIZ?`left:${ep.x}px;top:calc(${ep.y}% + 52px)`:`top:${M.end.y+50}px`}">${nm((L.boss||"Fim do ano").toUpperCase())}</div>`;
@@ -2577,10 +2619,10 @@ function enter(id){
 function askQuestion(cfg){
   const q=cfg.q||pickQ(cfg.lid,cfg.subj);
   if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
-  C={...cfg,q,opts:shuffle(q.slice(2,6)),answer:q[2],locked:false};
+  C={...cfg,q,opts:shuffle(q.slice(2,6)),answer:q[2],locked:false,bluff:-1,helpUsed:!!cfg.helpUsed};
   $("q-tag").innerHTML=nm(cfg.tag.toUpperCase());$("q-tag").className="tag "+(cfg.cls||"t-q");
   $("q-hearts").textContent=hearts();
-  $("q-subj").innerHTML=nm(`${ICONS[q[0]]||"📚"} ${SUBJN[q[0]]||""} · ${LNAME(cfg.lid)}`);
+  $("q-subj").innerHTML=nm(`${ICONS[q[0]]||"📚"} ${SUBJN[q[0]]||""} · ${LNAME(cfg.shown||cfg.lid)}`);
   $("q-ans").innerHTML=C.opts.map((o,i)=>`<button class="ans blk" style="animation-delay:${i*90+150}ms" onclick="answer(${i})"><span class="l">${"ABCD"[i]}</span><span>${o}</span></button>`).join("");
   $("q-tip").style.display="none";$("q-exp").style.display="none";$("q-fb").textContent="";$("q-fb").className="feedback";
   $("q-next").style.display="none";$("q-bar").classList.remove("on");$("s-q").style.paddingBottom="";$("q-sub").innerHTML="";clearTimeout(FBT);$("q-helps").style.display="";
@@ -2590,7 +2632,7 @@ function askQuestion(cfg){
   updHelps();go("s-q");
   typewrite($("q-text"),q[1]);
 }
-function updHelps(){Object.keys(HELP).forEach(k=>{$("c-"+k).textContent=S.help[k];$("h-"+k).disabled=S.help[k]<=0||C.locked||!!C.noHelps})}
+function updHelps(){Object.keys(HELP).forEach(k=>{$("c-"+k).textContent=S.help[k];$("h-"+k).disabled=S.help[k]<=0||C.locked||!!C.noHelps||!!C.helpUsed});updSpecial()}
 function losePrize(why){
   const n=C.node;if(!n||!n.prize)return;n.prize=null;
   const pb=$("q-prize");pb.innerHTML=`❌ PRÊMIO PERDIDO<small>${why}</small>`;pb.className="prize-bar on lost";shake(pb);
@@ -2605,9 +2647,10 @@ function answer(i){
   let ticks=0;const roll=setInterval(()=>{sfx("tick");if(++ticks>8)clearInterval(roll)},120);
   setTimeout(()=>{
     clearInterval(roll);
-    const ok=C.opts[i]===C.answer;
+    const isBluff=i===C.bluff,ok=isBluff?Math.random()<.75:C.opts[i]===C.answer;
     btns[i].classList.remove("chosen");
     const rb=btns.find((b,k)=>C.opts[k]===C.answer);rb.classList.add("right");
+    if(isBluff){if(ok){btns[i].classList.add("right");toast("O professor caiu no papo do Certezas! 🎲")}else toast("O professor percebeu a enrolação! 🎲")}
     if(ok){
       S.score+=C.points*S.mult;S.right++;
       flash("ok");answerSound(true);burst(rb,OKC,18);floatText(rb,"+"+C.points*S.mult);
@@ -2620,14 +2663,16 @@ function answer(i){
       btns[i].classList.add("wrong");S.wrong++;losePrize("Você errou a pergunta.");
       flash("bad");answerSound(false);shake();
       let msg;
-      if(S.shield>0){S.shield--;msg="ERROU! O ESCUDO TE SALVOU 🛡️"}
-      else{S.lives--;const h=$("q-hearts");h.textContent=hearts();h.classList.remove("hurt");void h.offsetWidth;h.classList.add("hurt");msg=S.lives>0?"ERROU! -1 VIDA":"GAME OVER"}
+      if(C.recovery){msg="ERROU NA RECUPERAÇÃO"}
+      else if(S.shield>0){S.shield--;msg="ERROU! O ESCUDO TE SALVOU 🛡️"}
+      else{S.lives--;const h=$("q-hearts");h.textContent=hearts();h.classList.remove("hurt");void h.offsetWidth;h.classList.add("hurt");msg=S.lives>0?"ERROU! -1 VIDA":(gilCan()?"ÚLTIMA CHANCE!":"GAME OVER")}
       if(S.lives>0&&C.retry)msg+="<br><small>Você continua no mesmo ponto. Acerte outra pergunta para avançar.</small>";
       $("q-fb").innerHTML=nm(msg);$("q-fb").className="feedback bad";
     }
     if(C.q[6]){const e=$("q-exp");e.textContent="📘 "+C.q[6];e.style.display="block"}
     const nx=$("q-next");
-    if(S.lives<=0){nx.textContent="VER RESULTADO";nx.onclick=()=>finish("lose")}
+    if(C.recovery){nx.textContent="▶ CONTINUAR A PROVA";nx.onclick=()=>C.done(ok?"right":"wrong")}
+    else if(S.lives<=0){if(gilCan()){const d=C.done;nx.textContent="🩹 PROVA DE RECUPERAÇÃO";nx.onclick=()=>gilRecovery(d)}else{nx.textContent="VER RESULTADO";nx.onclick=()=>finish("lose")}}
     else{nx.textContent=!ok&&C.retry?"▶ OUTRA PERGUNTA":"▶ CONTINUAR";nx.onclick=()=>C.done(ok?"right":"wrong")}
     nx.style.display="block";
     const fb=$("q-fb"),parts=fb.innerHTML.split("<br>");fb.innerHTML=parts[0];$("q-sub").innerHTML=parts.slice(1).join("<br>");
@@ -2637,14 +2682,13 @@ function answer(i){
 }
 let FBT=null;
 function useSkip(){
-  if(C.locked||C.noHelps||S.help.skip<=0)return;S.help.skip--;losePrize("Você usou uma ajuda.");sfx("skip");
-  if(C.swap){toast("Pergunta trocada!");askQuestion({...C,q:pickQ(C.lid,C.subj||grp(C.q[0]))})}
-  else{toast("Pergunta pulada, sem perder vida.");C.done("skip")}
+  if(C.locked||C.noHelps||C.helpUsed||S.help.skip<=0)return;S.help.skip--;losePrize("Você usou uma ajuda.");sfx("skip");
+  toast("Pergunta trocada!");askQuestion({...C,q:pickQ(C.lid,C.subj||grp(C.q[0])),helpUsed:true});
 }
 function useHint(){
-  if(C.locked||C.noHelps||S.help.hint<=0)return;S.help.hint--;losePrize("Você usou uma ajuda.");sfx("hint");
+  if(C.locked||C.noHelps||C.helpUsed||S.help.hint<=0)return;S.help.hint--;C.helpUsed=true;losePrize("Você usou uma ajuda.");sfx("hint");
   const btns=[...document.querySelectorAll(".ans")];
-  const gone=shuffle(btns.filter((b,k)=>C.opts[k]!==C.answer&&!b.classList.contains("gone"))).slice(0,2);
+  const gone=shuffle(btns.filter((b,k)=>C.opts[k]!==C.answer&&!b.classList.contains("gone"))).slice(0,1);
   gone.forEach((b,k)=>setTimeout(()=>{b.classList.add("gone");b.disabled=true;burst(b,["#9a8bb8","#ffffff"],8);sfx("hurt")},k*220));
   updHelps();
 }
@@ -2683,16 +2727,16 @@ function giveRandom(){const k=pick(Object.keys(HELP));S.help[k]++;return"1 "+HEL
 const COMMON=[
   {icon:"❤️",label:"Vida extra",fn:()=>{S.lives++}},
   {icon:"⏭️",label:"+1 Pular",fn:()=>{S.help.skip++}},
-  {icon:"🧑‍🤝‍🧑",label:"+1 Perguntar a alguém",fn:()=>{S.help.ask++}},
+  
   {icon:"💡",label:"+1 Dica",fn:()=>{S.help.hint++}}];
 const RARE=[
   {icon:"🛡️",label:"Escudo de caderno",fn:()=>{S.shield++}},
-  {icon:"🎒",label:"Kit completo (+1 de cada ajuda)",fn:()=>{S.help.skip++;S.help.ask++;S.help.hint++}},
+  {icon:"🎒",label:"Kit completo (+1 de cada ajuda)",fn:()=>{S.help.skip++;S.help.hint++}},
   {icon:"💛",label:"Coração de ouro (todas as vidas)",fn:()=>{S.lives=Math.max(3,S.lives+1)}},
   {icon:"⭐",label:"Boletim dourado (2x pontos no ano)",fn:()=>{S.mult=2}},
   {icon:"💡",label:"Cola premium (+2 Dicas)",fn:()=>{S.help.hint+=2}}];
 function ask(cfg){const f=()=>askQuestion({retry:true,node:here(),awards:true,...cfg,done:r=>r==="wrong"?f():(cfg.after||toMap)()});f()}
-function nodeQ(){ask({lid:LEVELS[S.lvl].id,tag:"Pergunta",cls:"t-q",points:Math.round(base()*[1,1.5,2][curLane()])})}
+function nodeQ(){ask({lid:Math.random()<.2?hardLid():LEVELS[S.lvl].id,shown:LEVELS[S.lvl].id,tag:"Pergunta",cls:"t-q",points:Math.round(base()*[1,1.5,2][curLane()])})}
 function nodeHard(){ask({lid:hardLid(),tag:"💀 Desafio difícil",cls:"t-hard",points:Math.round(base()*(curLane()===2?3:2.5))})}
 const EVENTS=[
   ()=>panel({icon:"📝",title:"Prova surpresa!",text:"Duas perguntas seguidas. Cada erro custa 1 vida e você só sai daqui acertando as duas.",buttons:[{label:"▶ ENCARAR A PROVA",fn:()=>{
@@ -2721,6 +2765,7 @@ function runBoss(){
   const list=L.final?[...subs,...shuffle(Object.keys(SUBJ)).slice(0,3)].map((s,i)=>({s,lid:i%2?"E3":"F"})):subs.map(s=>({s,lid:L.id}));
   let k=0;
   const ask=()=>{
+    while(k<list.length&&S.ban&&S.ban.lvl===S.lvl&&grp(list[k].s)===S.ban.g)k++;
     if(k>=list.length)return L.final?finish("win"):bonusChoice();
     const it=list[k];
     askQuestion({lid:it.lid,subj:it.s,tag:`${L.final?"📜 Mini ENEM":"🎓 Formatura"} ${k+1}/${list.length}`,cls:"t-boss",points:base()*3,swap:true,retry:true,done:r=>{if(r!=="wrong")k++;ask()}});
@@ -2733,14 +2778,14 @@ function bonusChoice(){
   panel({icon:"🏆",title:"Formatura concluída!",text:`Você venceu a prova ${DO(L)}. Escolha um bônus para a próxima etapa.`,buttons:[
     {icon:"💚",label:"Vida extra",desc:"Ganha +1 vida (pode passar de 3)",fn:()=>{S.lives++;nextYear()}},
     {icon:"💡",label:"Cola permitida",desc:"Ganha 2 Dicas",fn:()=>{S.help.hint+=2;nextYear()}},
-    {icon:"🤝",label:"Amigo inteligente",desc:"Ganha 1 Perguntar a alguém no início de cada ano",fn:()=>{S.friend=true;nextYear()}}]});
+    {icon:"🛡️",label:"Escudo de caderno",desc:"O próximo erro não tira vida",fn:()=>{S.shield++;nextYear()}}]});
   setTimeout(()=>{burst($("p-icon"),GOLDC,26)},150);
 }
 function nextYear(){
   if(S.lvl>=LEVELS.length-1)return finish("win");
   const prev=LEVELS[S.lvl].stage;S.lvl++;
   const L=LEVELS[S.lvl],newStage=L.stage!==prev;
-  if(S.friend)S.help.ask++;
+  
   S.mult=1;genMap();sfx("level");flash("gold");
   panel({icon:newStage?"🏫":"⬆️",title:"Passou para "+PO(L)+"!",
     text:(newStage?`Bem-vindo ao ${STAGES[L.stage].name}. As perguntas ficam mais difíceis daqui pra frente.`:"Novo ano, novo mapa. Escolha bem o seu caminho.")+(S.friend?" Seu amigo inteligente te deu 1 Perguntar a alguém.":""),
@@ -2807,7 +2852,7 @@ async function makeResultImage(){
   g.textAlign="left";g.font=JR.replace("{s}",38);g.fillStyle="#c3aee6";g.fillText("ELO DE INTELIGÊNCIA",bx+185,by+68);
   g.font=fitFont(g,RES.elo.name.toUpperCase(),PX,32,bw-205);g.fillStyle="#ffc61a";g.fillText(RES.elo.name.toUpperCase(),bx+185,by+122);
   /* estatísticas em 4 caixas (sem emoji, para medir certo em todos os celulares) */
-  const items=[["ACERTOS",String(RES.right)],["PRECISÃO",RES.acc+"%"],["SÉRIE",RES.level],["VENTO",RES.dif.name]];
+  const items=[["ACERTOS",String(RES.right)],["PRECISÃO",RES.acc+"%"],["SÉRIE",RES.level],["RODADA",RES.dif.name]];
   const gap=16,cw=(W-220-gap*3)/4,ch=100,cy=1080;
   g.textAlign="center";
   items.forEach(([lab,val],i)=>{const cx=110+i*(cw+gap);
@@ -2835,6 +2880,108 @@ async function doShare(){
   try{await navigator.share({files:[SHARE_FILE],title:"Desafio “De Escola”",text})}catch(e){}
 }
 function closeShare(){$("sharebox").classList.remove("on")}
+/* ---------- Especiais dos personagens ---------- */
+const SK={
+  Gil:{name:"Recuperação",icon:"🩹",uses:1,where:"auto",c:["#2fa45d","#1d6b3b"],desc:"Burrão vai pra recuperação: quando as vidas acabam, faz uma prova com 3 perguntas da série. Acertando 2, recupera 2 vidas e avança direto para a próxima série. Ativa sozinho."},
+  Certezas:{name:"Alternativa E",icon:"🎲",uses:2,where:"q",c:["#7b45d6","#3f1b85"],desc:"Inventa uma alternativa E para enrolar o professor. Se escolher ela: 75% de chance de o professor aceitar como acerto e 25% de contar como erro."},
+  Capita:{name:"Falta aula",icon:"⚽",uses:2,where:"q",c:["#3d7be0","#24306e"],desc:"Mata aula para jogar bola: pula a pergunta e avança no mapa. Cada uso vale 2 pulos na mesma série. Não funciona nas formaturas."},
+  VSR:{name:"Arruaça",icon:"💥",uses:2,where:"q",c:["#d6404b","#7a1f2b"],desc:"Faz arruaça e é expulso da matéria: pula a pergunta e essa matéria não aparece mais até o fim da série."},
+  "Otávio":{name:"Churrasco",icon:"🍖",uses:2,where:"q",c:["#ef8f17","#9a4a08"],desc:"Faz um churrasco para agradar o professor: troca a pergunta por uma de duas séries antes."},
+  Piero:{name:"Piero TV",icon:"📺",uses:2,where:"q",c:["#e05a96","#6a35c9"],desc:"Assiste a uma videoaula na Piero TV e recebe a dica completa: elimina 2 alternativas erradas."},
+  Wallace:{name:"Oração",icon:"🙏",uses:2,where:"map",c:["#ffc61a","#c99412"],desc:"Crismado, faz uma oração e revela todo o mapa da série: perguntas, desafios, eventos e prêmios. É o único especial usado no mapa."}
+};
+const BLUFFS=["Depende do ponto de vista, professor","Todas as anteriores, com convicção","Nenhuma das anteriores, obviamente","A resposta certa é a E, confia","Isso vai cair só na próxima prova"];
+const skReady=()=>S&&S.sk.left>0&&S.sk.lastLvl!==S.lvl;
+function consumeSk(){S.sk.left--;S.sk.lastLvl=S.lvl}
+const gilCan=()=>S.char.name==="Gil"&&S.sk.left>0&&!C.recovery;
+function specialOK(){
+  if(!S||!C||C.locked||C.helpUsed||C.noHelps||C.recovery)return false;
+  const n=S.char.name,k=SK[n];if(k.where!=="q")return false;
+  if(n==="Capita"){if(C.swap)return false;if(S.capLvl===S.lvl&&S.capLeft>0)return true}
+  return skReady();
+}
+function updSpecial(){
+  const b=$("h-sp");if(!b||!S)return;const n=S.char.name,k=SK[n];
+  $("sp-ic").innerHTML=face(S.char,26);$("sp-lb").textContent="ESPECIAL DO "+n.toUpperCase();
+  const bonus=n==="Capita"&&S.capLvl===S.lvl&&S.capLeft>0;
+  $("c-sp").textContent=bonus?"+1":S.sk.left;b.disabled=!specialOK();
+  b.title=k.where==="auto"?"Ativa sozinho quando as vidas acabam":k.where==="map"?"Use no mapa":k.name;
+}
+const SKSFX={
+  Gil:()=>{[0,.22,.44].forEach(t=>{tone(660,.2,"square",t,.05,880)});playSeq([[72,.7,.1,"triangle"],[76,.8,.1,"triangle"],[79,.9,.1,"triangle"],[84,1,.4,"triangle",.05]])},
+  Certezas:()=>{for(let i=0;i<9;i++)noise(.04,i*.06,.06,3000+i*200,2000);playSeq([[67,.6,.1],[71,.7,.1],[74,.8,.35,"square",.05,.02]])},
+  Capita:()=>{vtone(2400,0,.12,"square",.05,.05);vtone(2400,.16,.4,"square",.05,.05);vtone(120,.65,.18,"sine",.14,0,40);noise(.12,.65,.08,900,300);playSeq([[79,.9,.1],[84,1,.3]])},
+  VSR:()=>{noise(.6,0,.14,5000,120);vtone(90,0,.6,"sawtooth",.08,0,40);vtone(60,.05,.7,"sine",.14,0,30);playSeq([[62,.7,.08,"square"],[61,.8,.08,"square"],[60,.9,.3,"square",.05,.03]])},
+  "Otávio":()=>{noise(.9,0,.05,7000,6000);[0,.35].forEach(t=>vtone(1568,t+.5,.5,"triangle",.05,.004));playSeq([[67,.4,.12],[72,.55,.3]])},
+  Piero:()=>{noise(.35,0,.09,6000,4000);playSeq([[76,.38,.09],[79,.47,.09],[84,.56,.09],[88,.65,.35,"square",.05,.01]]);vtone(1046,.38,.4,"triangle",.02)},
+  Wallace:()=>{[60,64,67,72].forEach((n,i)=>vtone(MIDI(n),i*.05,1.3,"triangle",.04,.006));[84,88,91].forEach((n,i)=>vtone(MIDI(n),.4+i*.12,.6,"sine",.03))}
+};
+function skillFx(name,cb){
+  const k=SK[name],o=$("skillfx"),c=CHARS.find(x=>x.name===name);
+  o.innerHTML=`<div class="sk-wrap"><div class="sk-card" style="--c1:${k.c[0]};--c2:${k.c[1]}">${face(c,76)}<div><div class="sk-top">ESPECIAL DO ${name.toUpperCase()}!</div><div class="sk-name">${k.icon} ${k.name.toUpperCase()}</div></div></div><div class="sk-shadow"></div></div>`;
+  o.classList.remove("out");o.classList.add("on");
+  try{SKSFX[name]()}catch(e){}duckMusic(1.4);flash("gold");shake();
+  setTimeout(()=>burst(o.querySelector(".sk-card"),[k.c[0],"#ffe066","#ffffff"],28),200);
+  setTimeout(()=>{o.classList.add("out");setTimeout(()=>{o.classList.remove("on","out");cb&&cb()},300)},REDUCE?500:1350);
+}
+function useSpecial(){
+  if(!specialOK())return;
+  const n=S.char.name,bonus=n==="Capita"&&S.capLvl===S.lvl&&S.capLeft>0;
+  if(!bonus)consumeSk();
+  C.helpUsed=true;losePrize("Você usou um especial.");updHelps();
+  skillFx(n,()=>doSpecial(n,bonus));
+}
+function doSpecial(n,bonus){
+  const btns=[...document.querySelectorAll(".ans")];
+  if(n==="Certezas"){
+    C.bluff=C.opts.length;C.opts.push(pick(BLUFFS));
+    $("q-ans").insertAdjacentHTML("beforeend",`<button class="ans blk bluff" onclick="answer(${C.bluff})"><span class="l">E</span><span>${C.opts[C.bluff]}</span></button>`);
+  }else if(n==="Capita"){
+    if(bonus)S.capLeft--;else{S.capLvl=S.lvl;S.capLeft=1}
+    C.locked=true;toast(bonus?"Último pulo do Capita nesta série!":"Matou aula! Ainda resta 1 pulo nesta série.");C.done("skip");
+  }else if(n==="VSR"){
+    const g=grp(C.q[0]);S.ban={lvl:S.lvl,g};C.locked=true;
+    toast(`Expulso de ${SUBJN[g]} até o fim da série!`);C.done("skip");
+  }else if(n==="Otávio"){
+    const lid=LEVELS[Math.max(0,S.lvl-2)].id;
+    toast("Churrasco aprovado! Pergunta de duas séries antes.");
+    askQuestion({...C,q:pickQ(lid,C.subj||undefined),lid,shown:lid,helpUsed:true});
+  }else if(n==="Piero"){
+    shuffle(btns.filter((b,k)=>C.opts[k]!==C.answer&&!b.classList.contains("gone"))).slice(0,2)
+      .forEach((b,k)=>setTimeout(()=>{b.classList.add("gone");b.disabled=true;burst(b,["#e05a96","#ffffff"],10);sfx("hurt")},k*220));
+  }
+  updHelps();
+}
+function useWallace(){
+  if(moving||!S||S.char.name!=="Wallace"||!skReady()||S.map.revealed)return;
+  consumeSk();skillFx("Wallace",()=>{S.map.revealed=true;renderMap();toast("Caminhos revelados! Escolha com sabedoria.")});
+}
+function gilRecovery(){
+  consumeSk();let k=0,ok=0,bad=0;
+  const step=()=>{
+    if(ok>=2)return gilPass();
+    if(bad>=2)return finish("lose");
+    k++;askQuestion({lid:LEVELS[S.lvl].id,tag:`🩹 Recuperação ${k}/3`,cls:"t-boss",points:0,noHelps:true,recovery:true,
+      done:r=>{if(r==="right")ok++;else bad++;step()}});
+  };
+  skillFx("Gil",()=>{toast("Prova de recuperação: acerte 2 de 3!");step()});
+}
+function gilPass(){
+  S.lives=2;sfx("level");flash("gold");
+  if(LEVELS[S.lvl].final){toast("Passou na recuperação! +2 vidas. O Mini ENEM continua te esperando.");toMap();return}
+  panel({icon:"🎓",title:"Passou na recuperação!",text:"O Gil recuperou 2 vidas e avança direto para a próxima série.",buttons:[{label:"▶ AVANÇAR DE SÉRIE",fn:nextYear}]});
+}
+/* Seleção: detalhe com confirmação */
+let detIdx=0;
+function openCharDet(i){
+  const c=CHARS[i],k=SK[c.name];detIdx=i;sfx("select");
+  $("cd-img").src=IMGS[c.name].p;$("cd-img").alt=c.name;$("cd-name").textContent=c.name.toUpperCase();
+  $("cd-sk").textContent=`${k.icon} Especial: ${k.name}`;$("cd-desc").textContent=k.desc;
+  $("cd-rule").textContent=c.name==="Gil"?"1 uso por jornada.":"Até 2 usos por jornada, nunca 2 vezes na mesma série.";
+  $("cd-ok").onclick=()=>{closeCharDet();chooseChar(detIdx)};
+  $("chardet").classList.add("on");
+}
+function closeCharDet(){$("chardet").classList.remove("on")}
 let starting=false;
 function startFx(btn){
   if(starting)return;starting=true;
