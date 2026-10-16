@@ -2144,7 +2144,7 @@ const musicLevel=()=>muted?0:curve(VOL.music)*.9, sfxLevel=()=>muted?0:curve(VOL
 function audio(){
   if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)();MG=AC.createGain();SG=AC.createGain();
     MG.gain.value=musicLevel();SG.gain.value=sfxLevel();MG.connect(AC.destination);SG.connect(AC.destination)}catch(e){AC=null}}
-  if(AC&&AC.state==="suspended"&&!document.hidden)AC.resume();
+  if(AC&&AC.state!=="running"&&AC.state!=="closed"&&!document.hidden){try{const r=AC.resume();if(r&&r.catch)r.catch(()=>{})}catch(e){}}
   return AC;
 }
 function setGains(){if(!AC)return;const t=AC.currentTime;
@@ -2159,14 +2159,37 @@ function applyVol(){
   $("mute-all").textContent=muted?"🔊 LIGAR O SOM":"🔇 SILENCIAR TUDO";
   $("snd").textContent=muted||(VOL.music===0&&VOL.sfx===0)?"🔇":"🔊";
 }
+function playMusicSrc(){
+  if(!AC||!MBUF)return;try{if(MSRC)MSRC.stop()}catch(e){}
+  MSRC=AC.createBufferSource();MSRC.buffer=MBUF;MSRC.loop=true;MSRC.connect(MG);MSRC.start();
+}
+/* Reconstrói o áudio quando o navegador não deixa retomar (comum no iPhone após sair do app) */
+function rebuildAudio(){
+  try{if(MSRC)MSRC.stop()}catch(e){}
+  try{const c=AC&&AC.state!=="closed"&&AC.close();if(c&&c.catch)c.catch(()=>{})}catch(e){}
+  AC=null;MG=null;SG=null;MSRC=null;
+  if(!audio())return;
+  if(MBUF)playMusicSrc();
+}
+let wakeTimer=null;
+function wakeAudio(){
+  if(!AC||document.hidden)return;
+  if(AC.state==="running")return;
+  try{const r=AC.resume();if(r&&r.catch)r.catch(()=>{})}catch(e){}
+  clearTimeout(wakeTimer);
+  wakeTimer=setTimeout(()=>{if(AC&&AC.state!=="running"&&!document.hidden)rebuildAudio()},400);
+}
 function startMusic(){
-  const a=audio();if(!a)return;
-  if(started)return;started=true;
-  decode(MUSIC).then(buf=>{MBUF=buf;if(!MSRC){MSRC=a.createBufferSource();MSRC.buffer=buf;MSRC.loop=true;MSRC.connect(MG);MSRC.start()}}).catch(()=>{});
+  if(started){wakeAudio();return}
+  const a=audio();if(!a)return;started=true;
+  decode(MUSIC).then(buf=>{MBUF=buf;if(!MSRC)playMusicSrc()}).catch(()=>{});
   Object.keys(VOICE).forEach(n=>decode(VOICE[n]).then(b=>{VBUF[n]=b}).catch(()=>{}));
 }
-["pointerdown","touchend","click","keydown"].forEach(ev=>document.addEventListener(ev,startMusic,{passive:true}));
-document.addEventListener("visibilitychange",()=>{if(!AC)return;if(document.hidden)AC.suspend();else AC.resume()});
+["pointerdown","touchstart","touchend","click","keydown"].forEach(ev=>document.addEventListener(ev,startMusic,{passive:true,capture:true}));
+function onReturn(){if(!AC||document.hidden)return;try{const r=AC.resume();if(r&&r.catch)r.catch(()=>{})}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(!AC)return;if(document.hidden){try{const r=AC.suspend();if(r&&r.catch)r.catch(()=>{})}catch(e){}}else onReturn()});
+window.addEventListener("pageshow",onReturn);
+window.addEventListener("focus",onReturn);
 function playVoice(name,onStart){
   const a=audio();if(!a||!VOICE[name])return false;
   const play=buf=>{
@@ -2733,21 +2756,30 @@ async function makeResultImage(){
   const shadowText=(t,x,y,col,sh)=>{g.fillStyle=sh||"#6a35c9";g.fillText(t,x+6,y+6);g.fillStyle=col;g.fillText(t,x,y)};
   g.font=PX.replace("{s}",34);shadowText("DESAFIO",W/2,120,"#c9adff","#05010d");
   g.font=PX.replace("{s}",62);shadowText("“DE ESCOLA”",W/2,205,"#ffc61a");
-  try{const im=await loadImg(IMGS[RES.char.name].p);const sz=380,x=(W-sz)/2,y=245;
-    g.fillStyle="#05010d";g.fillRect(x-8+14,y-8+14,sz+16,sz+16);g.fillStyle="#ffc61a";g.fillRect(x-12,y-12,sz+24,sz+24);g.drawImage(im,x,y,sz,sz)}catch(e){}
-  g.font=PX.replace("{s}",40);shadowText(RES.char.name.toUpperCase(),W/2,700,"#ffc61a");
-  g.font=fitFont(g,RES.title,DG,42,W-160);g.fillStyle="#ffffff";g.fillText(RES.title,W/2,762);
-  g.font=JR.replace("{s}",150);shadowText(RES.score.toLocaleString("pt-BR")+" pts",W/2,905,"#ffe066","#6a35c9");
-  const bx=120,by=950,bw=W-240,bh=200;g.fillStyle="#05010d";g.fillRect(bx+10,by+10,bw,bh);g.fillStyle="#3a1e6b";g.fillRect(bx,by,bw,bh);
-  g.fillStyle="#2a1450";g.fillRect(bx+24,by+20,160,160);drawPix(g,RES.elo.rows,{...PAL0,...RES.elo.pal},bx+24,by+20,160);
-  g.textAlign="left";g.font=JR.replace("{s}",40);g.fillStyle="#c3aee6";g.fillText("ELO DE INTELIGÊNCIA",bx+210,by+70);
-  g.font=fitFont(g,RES.elo.name.toUpperCase(),PX,34,bw-230);g.fillStyle="#ffc61a";g.fillText(RES.elo.name.toUpperCase(),bx+210,by+130);
+  try{const im=await loadImg(IMGS[RES.char.name].p);const sz=340,x=(W-sz)/2,y=245;
+    g.fillStyle="#05010d";g.fillRect(x-12+14,y-12+14,sz+24,sz+24);g.fillStyle="#ffc61a";g.fillRect(x-12,y-12,sz+24,sz+24);g.drawImage(im,x,y,sz,sz)}catch(e){}
   g.textAlign="center";
-  const st=`✅ ${RES.right} acertos   🎯 ${RES.acc}%   📍 ${RES.level}   ${RES.dif.icon} ${RES.dif.name}`;
-  g.font=fitFont(g,st,DG,40,W-140);g.fillStyle="#ffffff";g.fillText(st,W/2,1225);
+  g.font=PX.replace("{s}",40);shadowText(RES.char.name.toUpperCase(),W/2,660,"#ffc61a");
+  g.font=fitFont(g,RES.title,DG,40,W-160);g.fillStyle="#ffffff";g.fillText(RES.title,W/2,718);
+  g.font=JR.replace("{s}",140);shadowText(RES.score.toLocaleString("pt-BR")+" pts",W/2,850,"#ffe066","#6a35c9");
+  /* caixa do elo */
+  const bx=110,by=885,bw=W-220,bh=170;g.fillStyle="#05010d";g.fillRect(bx+10,by+10,bw,bh);g.fillStyle="#3a1e6b";g.fillRect(bx,by,bw,bh);
+  g.fillStyle="#2a1450";g.fillRect(bx+20,by+15,140,140);drawPix(g,RES.elo.rows,{...PAL0,...RES.elo.pal},bx+20,by+15,140);
+  g.textAlign="left";g.font=JR.replace("{s}",38);g.fillStyle="#c3aee6";g.fillText("ELO DE INTELIGÊNCIA",bx+185,by+68);
+  g.font=fitFont(g,RES.elo.name.toUpperCase(),PX,32,bw-205);g.fillStyle="#ffc61a";g.fillText(RES.elo.name.toUpperCase(),bx+185,by+122);
+  /* estatísticas em 4 caixas (sem emoji, para medir certo em todos os celulares) */
+  const items=[["ACERTOS",String(RES.right)],["PRECISÃO",RES.acc+"%"],["SÉRIE",RES.level],["VENTO",RES.dif.name]];
+  const gap=16,cw=(W-220-gap*3)/4,ch=100,cy=1080;
+  g.textAlign="center";
+  items.forEach(([lab,val],i)=>{const cx=110+i*(cw+gap);
+    g.fillStyle="#05010d";g.fillRect(cx+6,cy+6,cw,ch);g.fillStyle="#2a1450";g.fillRect(cx,cy,cw,ch);
+    g.strokeStyle="#6a35c9";g.lineWidth=3;g.strokeRect(cx+1.5,cy+1.5,cw-3,ch-3);
+    g.font=JR.replace("{s}",30);g.fillStyle="#c3aee6";g.fillText(lab,cx+cw/2,cy+36);
+    g.font=fitFont(g,val,DG,36,cw-20);g.fillStyle="#ffffff";g.fillText(val,cx+cw/2,cy+80);
+  });
   const url=/^https?:/.test(location.protocol)&&!/claude\.ai/.test(location.host)?location.host+location.pathname.replace(/index\.html$/,""):"";
-  g.font=fitFont(g,"Será que você bate esse resultado?",DG,34,W-140);g.fillStyle="#c9adff";g.fillText("Será que você bate esse resultado?",W/2,1282);
-  if(url){g.font=fitFont(g,url,JR,34,W-140);g.fillStyle="#ffe066";g.fillText(url,W/2,1318)}
+  g.font=fitFont(g,"Será que você bate esse resultado?",DG,34,W-160);g.fillStyle="#c9adff";g.fillText("Será que você bate esse resultado?",W/2,url?1238:1255);
+  if(url){g.font=fitFont(g,url,JR,36,W-160);g.fillStyle="#ffe066";g.fillText(url,W/2,1283)}
   return cv;
 }
 async function shareResult(){
