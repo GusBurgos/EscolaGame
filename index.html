@@ -332,6 +332,14 @@ button.blk:active:not(:disabled){transform:translate(4px,4px);box-shadow:inset 4
 body.wide .wrap{max-width:1100px}
 body.wide #s-map .hud{max-width:640px;margin:0 auto}
 
+#sharebox{position:fixed;inset:0;z-index:52;display:none;place-items:center;background:rgba(10,3,25,.85);padding:16px;overflow:auto}
+#sharebox.on{display:grid}
+.sb-card{background:var(--surface);padding:16px;max-width:420px;width:100%;text-align:center;animation:pop .35s steps(4)}
+.sb-title{font-family:var(--pixel);font-size:14px;color:var(--gold);margin-bottom:12px}
+#sb-img{display:block;width:100%;height:auto;border:4px solid var(--edge);-webkit-touch-callout:default;user-select:auto}
+.sb-tip{font-size:15px;color:var(--muted);margin:10px 0 0}
+#sb-dl{display:block;text-decoration:none;text-align:center}
+
 /* ---------- Legibilidade (fontes pixeladas) ---------- */
 body{font-synthesis:none;-webkit-font-smoothing:antialiased}
 button{-webkit-tap-highlight-color:transparent}
@@ -498,7 +506,8 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
   <p id="r-msg"></p>
   <div id="r-elo"></div>
   <div class="stats" id="r-stats"></div>
-  <button class="cta blk" style="margin-top:26px" onclick="go('s-char')">▶ NOVA JORNADA</button>
+  <button class="cta blk" style="margin-top:26px" onclick="shareResult()">📤 COMPARTILHAR RESULTADO</button>
+  <button class="cta ghost blk" onclick="go('s-char')">▶ NOVA JORNADA</button>
   <button class="cta ghost blk" onclick="go('s-home')">TELA INICIAL</button>
 </section>
 
@@ -506,6 +515,14 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
 <div class="toast" id="toast"></div>
 <div id="flash"></div>
 <div id="reveal" aria-live="polite"></div>
+<div id="sharebox" role="dialog" aria-label="Compartilhar resultado"><div class="sb-card blk">
+  <div class="sb-title">SEU RESULTADO</div>
+  <img id="sb-img" alt="Imagem do resultado">
+  <p class="sb-tip">No celular, você também pode tocar e segurar a imagem para salvar ou enviar.</p>
+  <button class="cta blk" id="sb-share" onclick="doShare()">📤 ENVIAR IMAGEM</button>
+  <a class="cta ghost blk" id="sb-dl" download="desafio-de-escola.png">⬇️ BAIXAR IMAGEM</a>
+  <button class="back" onclick="closeShare()">Fechar</button>
+</div></div>
 <div id="startfx" aria-hidden="true"><div class="sf-text">VAMOS<br>LÁ!</div></div>
 <div id="herofx" aria-live="polite"><div class="hf-rays"></div><div class="hf-card"><div class="hf-img"><img id="hf-img" alt=""><i class="hf-glint"></i></div><div class="hf-name" id="hf-name"></div><div class="hf-tag" id="hf-tag"></div></div><div class="hf-skip">toque para continuar</div></div>
 
@@ -2219,6 +2236,35 @@ const SFX={
 const CHARSFX=[["C5","E5","G5","C6"],["G4","B4","D5","G5"],["A4","C5","E5","A5"],["D5","F5","A5","D6"],["F4","A4","C5","F5"]];
 function charSfx(i){seq(CHARSFX[i]||CHARSFX[0],.065,"square",.045,.12);tone(NT.C7,.18,"triangle",.3,.02)}
 function sfx(n){try{SFX[n]&&SFX[n]()}catch(e){}}
+
+/* ---------- Musiquinhas de acerto e erro ---------- */
+const MIDI=n=>440*Math.pow(2,(n-69)/12);
+function vtone(f,t0,d,type="square",vol=.045,vib=0,slide){
+  const a=audio();if(!a||muted||!VOL.sfx)return;const t=a.currentTime+t0;
+  const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);if(slide)o.frequency.linearRampToValueAtTime(slide,t+d);
+  if(vib){const l=a.createOscillator(),lg=a.createGain();l.frequency.value=6;lg.gain.value=f*vib;l.connect(lg).connect(o.frequency);l.start(t);l.stop(t+d+.05)}
+  g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(vol,t+.012);g.gain.setValueAtTime(vol,t+d*.7);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  o.connect(g).connect(SG);o.start(t);o.stop(t+d+.06);
+}
+const playSeq=(seq,tr=0)=>seq.forEach(([n,st,d,ty,v,vb])=>vtone(MIDI(n+tr),st,d,ty||"square",v||.045,vb||0));
+const kick=t=>vtone(150,t,.13,"sine",.13,0,45), snare=t=>noise(.1,t,.06,3200,1500);
+function duckMusic(d){if(!AC||!MG)return;const t=AC.currentTime,m=musicLevel();MG.gain.cancelScheduledValues(t);MG.gain.setTargetAtTime(m*.35,t,.03);MG.gain.setTargetAtTime(m,t+d,.3)}
+const WIN_J=[
+  tr=>{playSeq([[72,0,.1],[76,.1,.1],[79,.2,.1],[84,.3,.5,"square",.05,.01],[88,.3,.5,"triangle",.025],[48,0,.2,"triangle",.09],[55,.2,.2,"triangle",.09],[60,.4,.4,"triangle",.09]],tr);kick(0);snare(.3);kick(.4)},
+  tr=>{playSeq([[79,0,.08],[79,.1,.08],[79,.2,.08],[84,.32,.55,"square",.05,.012],[76,.32,.55,"triangle",.03],[43,0,.3,"triangle",.09],[48,.32,.5,"triangle",.09]],tr);snare(0);snare(.1);snare(.2);kick(.32)},
+  tr=>{playSeq([[76,0,.08],[79,.08,.08],[83,.16,.08],[88,.24,.08],[86,.32,.08],[88,.4,.45,"square",.05,.01],[52,0,.25,"triangle",.09],[57,.24,.5,"triangle",.09]],tr);kick(0);kick(.24);snare(.4)}];
+const LOSE_J=[
+  ()=>playSeq([[67,0,.32,"sawtooth",.04,.01],[66,.34,.32,"sawtooth",.04,.01],[65,.68,.32,"sawtooth",.04,.01],[64,1.02,.8,"sawtooth",.045,.03],[43,0,1.8,"triangle",.06]]),
+  ()=>{playSeq([[60,0,.14],[57,.16,.14],[53,.32,.14],[50,.48,.6,"square",.045,.02],[38,.48,.6,"triangle",.08]]);noise(.25,.48,.05,600,200)},
+  ()=>{vtone(220,0,.18,"square",.05,0,180);vtone(220,.22,.18,"square",.05,0,180);vtone(196,.46,.65,"sawtooth",.045,.02,110);noise(.2,0,.04,800,300)}];
+let STREAK=0;
+function answerSound(ok){
+  try{
+    if(ok){STREAK++;pick(WIN_J)(Math.min(STREAK-1,5));duckMusic(1.1);
+      if(STREAK>=3)playSeq([[96,.75,.06,"triangle",.03],[100,.81,.06,"triangle",.03],[103,.87,.14,"triangle",.03]])}
+    else{STREAK=0;pick(LOSE_J)();duckMusic(1.9)}
+  }catch(e){}
+}
 if(matchMedia("(hover:hover) and (pointer:fine)").matches){let last=null,lt=0;
   document.addEventListener("pointerover",e=>{const b=e.target.closest&&e.target.closest("button");if(!b){last=null;return}
     if(b===last||b.disabled||b.id==="snd")return;last=b;const n=performance.now();if(n-lt>60){lt=n;sfx("hover")}});}
@@ -2255,7 +2301,7 @@ function typewrite(el,text){
 function go(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));document.body.classList.toggle("wide",id==="s-map"&&HORIZ);window.scrollTo(0,0);if(id==="s-home")showBest()}
 function showBest(){let b=0;try{b=+localStorage.getItem("dde-jornada-best")||0}catch(e){}$("best").textContent=b?"RECORDE: "+pts(b):""}
 function toast(t){const el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2600)}
-const hearts=()=>"❤️".repeat(Math.max(0,S.lives))+"🖤".repeat(Math.max(0,3-S.lives));
+const hearts=()=>S.lives>6?"❤️×"+S.lives:"❤️".repeat(Math.max(0,S.lives))+"🖤".repeat(Math.max(0,3-S.lives));
 const base=()=>100+S.lvl*25;
 
 /* ---------- Setup ---------- */
@@ -2297,7 +2343,7 @@ function chooseRecorte(i){recorte=RECORTES[i];go("s-dif")}
 
 function startGame(k){
   const d=DIFS[k];
-  S={shield:0,mult:1,char:hero||CHARS[0],startLvl:recorte.start,dif:d,lvl:recorte.start,lives:3,help:{...d.helps},friend:false,score:0,right:0,wrong:0,used:{},lastSubj:null};
+  STREAK=0;S={shield:0,mult:1,char:hero||CHARS[0],startLvl:recorte.start,dif:d,lvl:recorte.start,lives:3,help:{...d.helps},friend:false,score:0,right:0,wrong:0,used:{},lastSubj:null};
   genMap();sfx("level");flash("gold");
   const L=LEVELS[S.lvl];
   panel({iconHTML:portrait(S.char,150),title:S.char.name+" chegou ao "+L.name+"!",text:`${STAGES[L.stage].name}. Escolha seu caminho no mapa e chegue ao fim do ano com vida.`,buttons:[{label:"▶ ABRIR O MAPA",fn:toMap}]});
@@ -2506,15 +2552,15 @@ function answer(i){
     const rb=btns.find((b,k)=>C.opts[k]===C.answer);rb.classList.add("right");
     if(ok){
       S.score+=C.points*S.mult;S.right++;
-      flash("ok");sfx("right");burst(rb,OKC,18);floatText(rb,"+"+C.points*S.mult);
+      flash("ok");answerSound(true);burst(rb,OKC,18);floatText(rb,"+"+C.points*S.mult);
       let won="";
       if(C.awards&&C.node&&C.node.prize){const pz=C.node.prize;C.node.prize=null;pz.fn();won=`<br><small>🎁 Ganhou: ${pz.icon} ${pz.label}</small>`;
         $("q-hearts").textContent=hearts();setTimeout(()=>{flash("gold");sfx("win");burst($("q-prize"),GOLDC,26)},450);
         $("q-prize").innerHTML="🎁 PRÊMIO CONQUISTADO!";$("q-prize").className="prize-bar on"}
-      $("q-fb").innerHTML=pick(["CERTA A RESPOSTA!","MANDOU BEM!","É ISSO AÍ!","NA MOSCA!"])+won;$("q-fb").className="feedback ok";
+      $("q-fb").innerHTML=pick(["CERTA A RESPOSTA!","MANDOU BEM!","É ISSO AÍ!","NA MOSCA!"])+(STREAK>=3?` 🔥 COMBO ×${STREAK}`:"")+won;$("q-fb").className="feedback ok";
     }else{
       btns[i].classList.add("wrong");S.wrong++;losePrize("Você errou a pergunta.");
-      flash("bad");sfx("wrong");shake();
+      flash("bad");answerSound(false);shake();
       let msg;
       if(S.shield>0){S.shield--;msg="ERROU! O ESCUDO TE SALVOU 🛡️"}
       else{S.lives--;const h=$("q-hearts");h.textContent=hearts();h.classList.remove("hurt");void h.offsetWidth;h.classList.add("hurt");msg=S.lives>0?"ERROU! -1 VIDA":"GAME OVER"}
@@ -2573,14 +2619,14 @@ const here=()=>S.map.nodes[S.pos];
 const curLane=()=>{const n=here();return n?n.lane:0};
 function giveRandom(){const k=pick(Object.keys(HELP));S.help[k]++;return"1 "+HELP[k][1]}
 const COMMON=[
-  {icon:"❤️",label:"Vida extra",fn:()=>{if(S.lives<3)S.lives++;else S.score+=150}},
+  {icon:"❤️",label:"Vida extra",fn:()=>{S.lives++}},
   {icon:"⏭️",label:"+1 Pular",fn:()=>{S.help.skip++}},
   {icon:"🧑‍🤝‍🧑",label:"+1 Perguntar a alguém",fn:()=>{S.help.ask++}},
   {icon:"💡",label:"+1 Dica",fn:()=>{S.help.hint++}}];
 const RARE=[
   {icon:"🛡️",label:"Escudo de caderno",fn:()=>{S.shield++}},
   {icon:"🎒",label:"Kit completo (+1 de cada ajuda)",fn:()=>{S.help.skip++;S.help.ask++;S.help.hint++}},
-  {icon:"💛",label:"Coração de ouro (todas as vidas)",fn:()=>{S.lives=3}},
+  {icon:"💛",label:"Coração de ouro (todas as vidas)",fn:()=>{S.lives=Math.max(3,S.lives+1)}},
   {icon:"⭐",label:"Boletim dourado (2x pontos no ano)",fn:()=>{S.mult=2}},
   {icon:"💡",label:"Cola premium (+2 Dicas)",fn:()=>{S.help.hint+=2}}];
 function ask(cfg){const f=()=>askQuestion({retry:true,node:here(),awards:true,...cfg,done:r=>r==="wrong"?f():(cfg.after||toMap)()});f()}
@@ -2623,7 +2669,7 @@ function bonusChoice(){
   const L=LEVELS[S.lvl];
   sfx("win");flash("gold");
   panel({icon:"🏆",title:"Formatura concluída!",text:`Você venceu a prova do ${L.name}. Escolha um bônus para a próxima etapa.`,buttons:[
-    {icon:"💚",label:"Vida extra",desc:S.lives<3?"Recupera 1 vida (máx. 3)":"Vidas cheias: vale 300 pts",fn:()=>{S.lives<3?S.lives++:S.score+=300;nextYear()}},
+    {icon:"💚",label:"Vida extra",desc:"Ganha +1 vida (pode passar de 3)",fn:()=>{S.lives++;nextYear()}},
     {icon:"💡",label:"Cola permitida",desc:"Ganha 2 Dicas",fn:()=>{S.help.hint+=2;nextYear()}},
     {icon:"🤝",label:"Amigo inteligente",desc:"Ganha 1 Perguntar a alguém no início de cada ano",fn:()=>{S.friend=true;nextYear()}}]});
   setTimeout(()=>{burst($("p-icon"),GOLDC,26)},150);
@@ -2660,6 +2706,7 @@ function finish(kind){
            quit:["🏳️","JORNADA ENCERRADA","Você parou no "+L.name+". O mapa vai estar diferente na próxima vez."]}[kind];
   $("r-icon").innerHTML=portrait(S.char,160);$("r-title").textContent=t[1];$("r-score").textContent=pts(S.score);$("r-msg").textContent=t[2];
   const E=eloFor(kind),el=ELOS[E.i];
+  RES={kind,title:t[1],score:S.score,char:S.char,dif:S.dif,right:S.right,wrong:S.wrong,acc:Math.round(E.a*100),level:L.name,elo:el};
   $("r-elo").innerHTML=`<div class="elo blk"><div class="elo-ic">${eloIcon(el,104)}</div><div class="elo-k">SEU ELO DE INTELIGÊNCIA</div><div class="elo-name">${el.name}</div><p>${el.desc}</p><div class="ladder">${ELOS.map((e,k)=>({e,k})).reverse().map(({e,k})=>`<div class="rung${k===E.i?" on":k<E.i?" past":""}">${eloIcon(e,30)}<span>${e.name}</span></div>`).join("")}</div></div>`;
   $("r-stats").innerHTML=`<span class="chip">${S.char.name}</span><span class="chip">${S.dif.icon} ${S.dif.name}</span><span class="chip">✅ ${S.right} acertos</span><span class="chip">❌ ${S.wrong} erros</span><span class="chip">🎯 ${Math.round(E.a*100)}% de acerto</span><span class="chip">📍 ${nm(L.name)}</span>`;
   setTimeout(()=>{sfx("open");burst(document.querySelector(".elo-ic"),GOLDC,22)},kind==="win"?1300:900);
@@ -2668,6 +2715,55 @@ function finish(kind){
   else if(kind==="lose"){sfx("over");flash("bad")}
 }
 showBest();
+/* ---------- Compartilhar resultado ---------- */
+let RES=null,SHARE_FILE=null;
+const loadImg=src=>new Promise((ok,no)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=no;i.src=src});
+function drawPix(ctx,rows,pal,x,y,size){const u=size/16,off=Math.floor((16-rows.length)/2);
+  rows.forEach((row,r)=>{for(let c=0;c<16;c++){const k=row[c];if(!k||k==="."||!pal[k])continue;ctx.fillStyle=pal[k];ctx.fillRect(Math.round(x+c*u),Math.round(y+(r+off)*u),Math.ceil(u),Math.ceil(u))}})}
+function fitFont(ctx,text,font,size,maxW){let s=size;do{ctx.font=font.replace("{s}",s);s-=2}while(ctx.measureText(text).width>maxW&&s>10);return ctx.font}
+async function makeResultImage(){
+  const W=1080,H=1350,cv=document.createElement("canvas");cv.width=W;cv.height=H;const g=cv.getContext("2d");
+  try{await Promise.all(['40px "Press Start 2P"','60px "Jersey 10"','40px "DotGothic16"'].map(f=>document.fonts.load(f)))}catch(e){}
+  const PX='{s}px "Press Start 2P", monospace',JR='{s}px "Jersey 10", sans-serif',DG='{s}px "DotGothic16", monospace';
+  const bg=g.createLinearGradient(0,0,0,H);bg.addColorStop(0,"#2a1058");bg.addColorStop(1,"#0d0420");g.fillStyle=bg;g.fillRect(0,0,W,H);
+  for(let i=0;i<140;i++){g.fillStyle=`rgba(255,226,130,${.15+Math.random()*.45})`;const z=Math.random()<.2?6:3;g.fillRect(Math.random()*W|0,Math.random()*H|0,z,z)}
+  g.fillStyle="rgba(0,0,0,.18)";for(let y=0;y<H;y+=6)g.fillRect(0,y,W,2);
+  g.strokeStyle="#05010d";g.lineWidth=18;g.strokeRect(30,30,W-60,H-60);g.strokeStyle="#ffc61a";g.lineWidth=8;g.strokeRect(36,36,W-72,H-72);
+  g.textAlign="center";g.textBaseline="alphabetic";
+  const shadowText=(t,x,y,col,sh)=>{g.fillStyle=sh||"#6a35c9";g.fillText(t,x+6,y+6);g.fillStyle=col;g.fillText(t,x,y)};
+  g.font=PX.replace("{s}",34);shadowText("DESAFIO",W/2,120,"#c9adff","#05010d");
+  g.font=PX.replace("{s}",62);shadowText("“DE ESCOLA”",W/2,205,"#ffc61a");
+  try{const im=await loadImg(IMGS[RES.char.name].p);const sz=380,x=(W-sz)/2,y=245;
+    g.fillStyle="#05010d";g.fillRect(x-8+14,y-8+14,sz+16,sz+16);g.fillStyle="#ffc61a";g.fillRect(x-12,y-12,sz+24,sz+24);g.drawImage(im,x,y,sz,sz)}catch(e){}
+  g.font=PX.replace("{s}",40);shadowText(RES.char.name.toUpperCase(),W/2,700,"#ffc61a");
+  g.font=fitFont(g,RES.title,DG,42,W-160);g.fillStyle="#ffffff";g.fillText(RES.title,W/2,762);
+  g.font=JR.replace("{s}",150);shadowText(RES.score.toLocaleString("pt-BR")+" pts",W/2,905,"#ffe066","#6a35c9");
+  const bx=120,by=950,bw=W-240,bh=200;g.fillStyle="#05010d";g.fillRect(bx+10,by+10,bw,bh);g.fillStyle="#3a1e6b";g.fillRect(bx,by,bw,bh);
+  g.fillStyle="#2a1450";g.fillRect(bx+24,by+20,160,160);drawPix(g,RES.elo.rows,{...PAL0,...RES.elo.pal},bx+24,by+20,160);
+  g.textAlign="left";g.font=JR.replace("{s}",40);g.fillStyle="#c3aee6";g.fillText("ELO DE INTELIGÊNCIA",bx+210,by+70);
+  g.font=fitFont(g,RES.elo.name.toUpperCase(),PX,34,bw-230);g.fillStyle="#ffc61a";g.fillText(RES.elo.name.toUpperCase(),bx+210,by+130);
+  g.textAlign="center";
+  const st=`✅ ${RES.right} acertos   🎯 ${RES.acc}%   📍 ${RES.level}   ${RES.dif.icon} ${RES.dif.name}`;
+  g.font=fitFont(g,st,DG,40,W-140);g.fillStyle="#ffffff";g.fillText(st,W/2,1225);
+  const url=/^https?:/.test(location.protocol)&&!/claude\.ai/.test(location.host)?location.host+location.pathname.replace(/index\.html$/,""):"";
+  g.font=fitFont(g,"Será que você bate esse resultado?",DG,34,W-140);g.fillStyle="#c9adff";g.fillText("Será que você bate esse resultado?",W/2,1282);
+  if(url){g.font=fitFont(g,url,JR,34,W-140);g.fillStyle="#ffe066";g.fillText(url,W/2,1318)}
+  return cv;
+}
+async function shareResult(){
+  if(!RES)return;sfx("coin");
+  const box=$("sharebox");box.classList.add("on");$("sb-img").src="";$("sb-img").alt="Gerando imagem…";
+  const cv=await makeResultImage();const url=cv.toDataURL("image/png");$("sb-img").src=url;$("sb-img").alt="Imagem do resultado";$("sb-dl").href=url;
+  SHARE_FILE=null;
+  cv.toBlob(b=>{if(!b)return;try{SHARE_FILE=new File([b],"desafio-de-escola.png",{type:"image/png"})}catch(e){}
+    const ok=SHARE_FILE&&navigator.canShare&&navigator.canShare({files:[SHARE_FILE]});$("sb-share").style.display=ok?"block":"none"},"image/png");
+}
+async function doShare(){
+  if(!SHARE_FILE)return;
+  const text=`Fiz ${RES.score.toLocaleString("pt-BR")} pts no Desafio “De Escola” e meu elo é ${RES.elo.name}! Duvido você bater.`;
+  try{await navigator.share({files:[SHARE_FILE],title:"Desafio “De Escola”",text})}catch(e){}
+}
+function closeShare(){$("sharebox").classList.remove("on")}
 let starting=false;
 function startFx(btn){
   if(starting)return;starting=true;
