@@ -409,6 +409,23 @@ body.enem-mode .qbox .subj{border-color:#ff8a95!important;background:rgba(0,0,0,
 @keyframes enemPulse{50%{opacity:.45}}
 @media (prefers-reduced-motion:reduce){body.enem-mode::after{animation:none}}
 
+#enamres{position:fixed;inset:0;z-index:49;display:none;place-items:center;padding:14px;overflow:auto;background:radial-gradient(circle,rgba(60,0,10,.9),rgba(10,0,3,.97))}
+#enamres.on{display:grid}
+.er-card{width:100%;max-width:420px;background:#3a0811;border-color:#ff4d5e;padding:16px;text-align:center;animation:pop .35s steps(4)}
+.er-title{font-family:var(--pixel);font-size:17px;color:#ffe066;text-shadow:3px 3px 0 #000}
+.er-sub{font-family:var(--label);font-size:18px;color:#ffb3ba;margin:6px 0 12px}
+#er-list{display:grid;gap:6px;text-align:left}
+.er-row{display:grid;grid-template-columns:28px 1fr 28px;align-items:center;gap:8px;padding:6px 10px;background:rgba(0,0,0,.3);border:2px solid #5c0d18;color:#fff;font-size:16px}
+.er-row em{font-style:normal;font-family:var(--pixel);font-size:14px;text-align:center;color:#ffb3ba}
+.er-row.ok{border-color:#38d26b;background:rgba(56,210,107,.15);animation:pop .25s steps(3)}
+.er-row.ok em{color:#38d26b}
+.er-row.bad{border-color:#ff4d5e;background:rgba(255,77,94,.15);animation:pop .25s steps(3)}
+.er-row.bad em{color:#ff4d5e}
+.er-score{font-family:var(--label);font-size:22px;color:#fff;margin:12px 0 4px;min-height:26px}
+.er-verdict{font-family:var(--pixel);font-size:clamp(16px,5vw,22px);min-height:30px;margin-bottom:12px}
+.er-verdict.win{color:#ffe066;text-shadow:3px 3px 0 #000;animation:pop .5s steps(5)}
+.er-verdict.lose{color:#ff4d5e;text-shadow:3px 3px 0 #000;animation:pop .5s steps(5)}
+
 /* ---------- Legibilidade (fontes pixeladas) ---------- */
 body{font-synthesis:none;-webkit-font-smoothing:antialiased}
 button{-webkit-tap-highlight-color:transparent}
@@ -511,7 +528,7 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
       <li>Errou? Perde 1 vida e fica no mesmo ponto até acertar outra pergunta. Perdeu as 3, a jornada acaba.</li>
       <li>Alguns pontos valem prêmio, mas só se você acertar de primeira e sem usar ajuda. Prêmios são raros, principalmente nos primeiros anos.</li>
       <li>No fim do 5º e do 9º ano tem o boss: a megaprova de formatura, com uma pergunta de cada matéria. Vencendo, você escolhe um bônus.</li>
-      <li>Chegue ao fim do 3º ano do Ensino Médio e enfrente o Mini ENEM.</li>
+      <li>Chegue ao fim do 3º ano do Ensino Médio e enfrente o ENAM, o Exame Nacional de Antas Médias.</li>
     </ol>
   </div>
 </section>
@@ -600,6 +617,11 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
   <button class="back" onclick="closeCharDet()">◀ Escolher outro</button>
 </div></div>
 <div id="skillfx" aria-live="polite"></div>
+<div id="enamres" role="dialog" aria-label="Resultado do ENAM"><div class="er-card blk">
+  <div class="er-title">📜 RESULTADO DO ENAM</div><div class="er-sub">Exame Nacional de Antas Médias</div>
+  <div id="er-list"></div><div class="er-score" id="er-score"></div><div class="er-verdict" id="er-verdict"></div>
+  <button class="cta blk" id="er-ok">▶ CONTINUAR</button>
+</div></div>
 <div id="sharebox" role="dialog" aria-label="Compartilhar resultado"><div class="sb-card blk">
   <div class="sb-title">SEU RESULTADO</div>
   <img id="sb-img" alt="Imagem do resultado">
@@ -2269,13 +2291,13 @@ const LEVELS=[
  {id:"6",name:"6º ano do Fund.",stage:1},{id:"7",name:"7º ano do Fund.",stage:1},{id:"8",name:"8º ano do Fund.",stage:1},
  {id:"9",name:"9º ano do Fund.",stage:1,boss:"Formatura do 9º ano"},
  {id:"E1",name:"1ª série do EM",stage:2},{id:"E2",name:"2ª série do EM",stage:2},
- {id:"E3",name:"3ª série do EM",stage:2,boss:"Mini ENEM",final:true}];
+ {id:"E3",name:"3ª série do EM",stage:2,boss:"ENAM",final:true}];
 const FEM=L=>/^E/.test(L.id), AO=L=>(FEM(L)?"à ":"ao ")+L.name, NO=L=>(FEM(L)?"na ":"no ")+L.name, DO=L=>(FEM(L)?"da ":"do ")+L.name, PO=L=>(FEM(L)?"a ":"o ")+L.name;
 const LNAME=id=>id==="F"?"nível ENEM":(LEVELS.find(l=>l.id===id)||{}).name;
 const RECORTES=[
  {name:"Desde o comecinho",desc:"Começa no 1º ano e vai até o ENEM",start:0,icon:"🎒"},
  {name:"Caos do sexto ano",desc:"Começa no 6º ano",start:5,icon:"🌀"},
- {name:"Loucura de colegial",desc:"Ensino Médio e Mini ENEM",start:9,icon:"🔥"}];
+ {name:"Loucura de colegial",desc:"Ensino Médio e o ENAM",start:9,icon:"🔥"}];
 const DIFS=[
  {name:"Rodada leve",icon:"☕",lens:[4,3,2],helps:{skip:1,hint:1},hardW:.25,desc:"Fases curtas: de 2 a 5 perguntas por série"},
  {name:"Desafio normal",icon:"📚",lens:[5,4,3],helps:{skip:1,hint:1},hardW:.25,desc:"Fases médias: de 3 a 6 perguntas por série"},
@@ -2809,6 +2831,7 @@ function askQuestion(cfg){
   updHelps();go("s-q");
   typewrite($("q-text"),q[1]);
   startTimer();
+  if(C.enam){$("q-hearts").textContent="📝 Sem vidas";$("q-prize").className="prize-bar"}
 }
 function updHelps(){Object.keys(HELP).forEach(k=>{$("c-"+k).textContent=S.help[k];$("h-"+k).disabled=S.help[k]<=0||C.locked||!!C.noHelps||!!C.helpUsed});updSpecial()}
 function losePrize(why){
@@ -2816,7 +2839,9 @@ function losePrize(why){
   const pb=$("q-prize");pb.innerHTML=`❌ PRÊMIO PERDIDO<small>${why}</small>`;pb.className="prize-bar on lost";shake(pb);
 }
 function answer(i){
-  if(C.locked)return;C.locked=true;stopTimer();const timeout=i<0;
+  if(C.locked)return;
+  if(C.enam)return enamMark(i);
+  C.locked=true;stopTimer();const timeout=i<0;
   clearInterval(twTimer);$("q-text").textContent=C.q[1];$("q-text").classList.remove("typing");
   const btns=[...document.querySelectorAll(".ans")];
   btns.forEach(b=>{b.disabled=true;b.style.animationDelay="0ms"});if(!timeout){btns[i].classList.add("chosen");sfx("ans"+i)}
@@ -2937,20 +2962,20 @@ function startBoss(){
   const L=LEVELS[S.lvl];
   flash("boss");sfx("boss");shake();
   panel({icon:L.final?"📜":"🎓",title:"BOSS: "+L.boss,
-    text:L.final?"10 questões, uma de cada matéria, com questões reais do ENEM. Cada erro custa 1 vida. Vença e conclua a jornada!":`Megaprova com uma questão de cada matéria ${DO(L)}. Cada erro custa 1 vida.`,
+    text:L.final?"Exame Nacional de Antas Médias: 10 questões reais do ENEM, uma de cada matéria. Aqui não há vidas: marque e siga em frente. O resultado só sai no final. Acerte pelo menos 6 para ser aprovado!":`Megaprova com uma questão de cada matéria ${DO(L)}. Cada erro custa 1 vida.`,
     buttons:[{label:"▶ COMEÇAR A PROVA",fn:runBoss}]});
 }
 function runBoss(){
   const L=LEVELS[S.lvl],subs=shuffle(Object.keys(SUBJ));
   const ENEM10=["M","P","H","G","Fs","Qm","Bi","L","S","I"];
   const list=L.final?shuffle(ENEM10).map(s=>({s,exact:true,lid:Q.F.some(q=>q[0]===s)?"F":"E3"})):subs.map(s=>({s,lid:L.id}));
-  if(L.final){document.body.classList.add("enem-mode");setTrack("boss");flash("bad");shake()}
+  if(L.final){S.enamRes=[];document.body.classList.add("enem-mode");setTrack("boss");flash("bad");shake()}
   let k=0;
   const ask=()=>{
     while(k<list.length&&S.ban&&S.ban.lvl===S.lvl&&grp(list[k].s)===S.ban.g)k++;
-    if(k>=list.length)return L.final?finish("win"):bonusChoice();
+    if(k>=list.length)return L.final?enamReveal():bonusChoice();
     const it=list[k];
-    askQuestion({want:L.final||S.lvl>=8?3:2,lid:it.lid,subj:it.s,exact:!!it.exact,tag:`${L.final?"📜 Mini ENEM":"🎓 Formatura"} ${k+1}/${list.length}`,cls:"t-boss",points:base()*3,swap:true,retry:true,done:r=>{if(r!=="wrong")k++;ask()}});
+    askQuestion({want:L.final||S.lvl>=8?3:2,lid:it.lid,subj:it.s,exact:!!it.exact,enam:!!L.final,tag:`${L.final?"📜 ENAM":"🎓 Formatura"} ${k+1}/${list.length}`,cls:"t-boss",points:base()*3,swap:true,retry:!L.final,done:r=>{if(L.final||r!=="wrong")k++;ask()}});
   };
   ask();
 }
@@ -2992,7 +3017,7 @@ function finish(kind){document.body.classList.remove("enem-mode");
   setTrack(kind==="win"?"party":kind==="lose"?"over":"main");
   if(kind==="win")S.score+=1000*S.lives;
   try{const b=+localStorage.getItem("dde-jornada-best")||0;if(S.score>b)localStorage.setItem("dde-jornada-best",S.score)}catch(e){}
-  const t={win:["🎓","JORNADA COMPLETA!","Você passou por todos os anos e venceu o Mini ENEM. Cada vida que sobrou valeu +1.000 pts."],
+  const t={win:["🎓","JORNADA COMPLETA!","Você passou por todos os anos e foi aprovado no ENAM. Cada vida que sobrou valeu +1.000 pts."],
            lose:["💀","GAME OVER","Reprovado "+NO(L)+". Revise a matéria e tente um caminho diferente."],
            quit:["🏳️","JORNADA ENCERRADA","Você parou "+NO(L)+". O mapa vai estar diferente na próxima vez."]}[kind];
   $("r-icon").innerHTML=portrait(S.char,160);$("r-title").textContent=t[1];$("r-score").textContent=pts(S.score);$("r-msg").textContent=t[2];
@@ -3082,6 +3107,7 @@ const gilCan=()=>S.char.name==="Gil"&&S.sk.left>0&&!C.recovery;
 function specialOK(){
   if(!S||!C||C.locked||C.helpUsed||C.noHelps||C.recovery)return false;
   const n=S.char.name,k=SK[n];if(k.where!=="q")return false;
+  if(C.enam&&n==="VSR")return false;
   if(n==="Capita"){if(C.swap)return false;if(S.capLvl===S.lvl&&S.capLeft>0)return true}
   return skReady();
 }
@@ -3153,7 +3179,7 @@ function gilRecovery(){
 }
 function gilPass(){
   S.lives=2;sfx("level");flash("gold");
-  if(LEVELS[S.lvl].final){toast("Passou na recuperação! +2 vidas. O Mini ENEM continua te esperando.");toMap();return}
+  if(LEVELS[S.lvl].final){toast("Passou na recuperação! +2 vidas. O ENAM continua te esperando.");toMap();return}
   panel({icon:"🎓",title:"Passou na recuperação!",text:"O Gil recuperou 2 vidas e avança direto para a próxima série.",buttons:[{label:"▶ AVANÇAR DE SÉRIE",fn:nextYear}]});
 }
 /* Seleção: detalhe com confirmação */
@@ -3188,6 +3214,35 @@ function startTimer(){
   },100);
 }
 paintTimed();
+/* ---------- ENAM: marca e segue; resultado só no final ---------- */
+function enamMark(i){
+  C.locked=true;stopTimer();
+  const timeout=i<0,isBluff=!timeout&&i===C.bluff,ok=timeout?false:isBluff?Math.random()<.75:C.opts[i]===C.answer;
+  const btns=[...document.querySelectorAll(".ans")];btns.forEach(b=>b.disabled=true);
+  if(!timeout){btns[i].classList.add("chosen");sfx("ans"+Math.min(i,3))}else sfx("tick");
+  ok?S.right++:S.wrong++;
+  S.enamRes.push({s:SUBJN[C.q[0]]||C.q[0],ic:ICONS[C.q[0]]||"📘",ok,t:C.q[1].replace(/^ENEM \d{4} · /,""),a:C.answer});
+  $("q-helps").style.display="none";
+  const fb=$("q-fb");fb.textContent=timeout?"⏱️ TEMPO! PRÓXIMA...":"RESPOSTA MARCADA ✍️";fb.className="feedback show";
+  clearTimeout(FBT);FBT=setTimeout(()=>{fb.classList.remove("show");C.done(ok?"right":"wrong")},650);
+}
+function enamReveal(){
+  stopTimer();const R=S.enamRes||[],o=$("enamres"),list=$("er-list");
+  const right=R.filter(r=>r.ok).length,pass=right>=6;
+  list.innerHTML=R.map((r,k)=>`<div class="er-row" id="er${k}"><span>${r.ic}</span><b>${r.s}</b><em>?</em></div>`).join("");
+  $("er-score").textContent="";$("er-verdict").textContent="";$("er-verdict").className="er-verdict";$("er-ok").style.visibility="hidden";
+  o.classList.add("on");sfx("boss");
+  R.forEach((r,k)=>setTimeout(()=>{const row=$("er"+k);row.classList.add(r.ok?"ok":"bad");row.querySelector("em").textContent=r.ok?"✔":"✘";
+    sfx(r.ok?"right":"hurt");$("er-score").textContent=`${R.slice(0,k+1).filter(x=>x.ok).length} acertos`},900+k*520));
+  setTimeout(()=>{
+    $("er-score").textContent=`${right}/10 acertos · mínimo 6`;
+    const v=$("er-verdict");v.textContent=pass?"🎉 APROVADO NO ENAM!":"❌ REPROVADO NO ENAM";v.className="er-verdict "+(pass?"win":"lose");
+    if(pass){S.score+=right*base()*3*S.mult;flash("gold");sfx("win");burst(v,GOLDC,40);setTimeout(()=>burst(v,GOLDC,30),400)}
+    else{flash("bad");shake();sfx("over")}
+    const b=$("er-ok");b.textContent=pass?"🏆 VER MINHA VITÓRIA":"▶ CONTINUAR";b.style.visibility="visible";
+    b.onclick=()=>{o.classList.remove("on");if(!pass)S.lives=0;finish(pass?"win":"lose")};
+  },900+R.length*520+900);
+}
 let starting=false;
 function startFx(btn){
   if(starting)return;starting=true;
