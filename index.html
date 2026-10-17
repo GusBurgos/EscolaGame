@@ -409,9 +409,9 @@ body.enem-mode .qbox .subj{border-color:#ff8a95!important;background:rgba(0,0,0,
 @keyframes enemPulse{50%{opacity:.45}}
 @media (prefers-reduced-motion:reduce){body.enem-mode::after{animation:none}}
 
-#enamres{position:fixed;inset:0;z-index:49;display:none;place-items:center;padding:14px;overflow:auto;background:radial-gradient(circle,rgba(60,0,10,.9),rgba(10,0,3,.97))}
+#enamres{position:fixed;inset:0;z-index:49;display:none;place-items:start center;padding:14px;overflow:auto;background:radial-gradient(circle,rgba(60,0,10,.9),rgba(10,0,3,.97))}
 #enamres.on{display:grid}
-.er-card{width:100%;max-width:420px;background:#3a0811;border-color:#ff4d5e;padding:16px;text-align:center;animation:pop .35s steps(4)}
+.er-card{margin:auto;width:100%;max-width:420px;background:#3a0811;border-color:#ff4d5e;padding:16px;text-align:center;animation:pop .35s steps(4)}
 .er-title{font-family:var(--pixel);font-size:17px;color:#ffe066;text-shadow:3px 3px 0 #000}
 .er-sub{font-family:var(--label);font-size:18px;color:#ffb3ba;margin:6px 0 12px}
 #er-list{display:grid;gap:6px;text-align:left}
@@ -425,6 +425,35 @@ body.enem-mode .qbox .subj{border-color:#ff8a95!important;background:rgba(0,0,0,
 .er-verdict{font-family:var(--pixel);font-size:clamp(16px,5vw,22px);min-height:30px;margin-bottom:12px}
 .er-verdict.win{color:#ffe066;text-shadow:3px 3px 0 #000;animation:pop .5s steps(5)}
 .er-verdict.lose{color:#ff4d5e;text-shadow:3px 3px 0 #000;animation:pop .5s steps(5)}
+
+#confetti{position:fixed;inset:0;width:100%;height:100%;z-index:52;pointer-events:none;display:none}
+.er-rays{display:none}
+.er-hero{display:none}
+#enamres.gold{background:radial-gradient(circle at 50% 38%,#fffbe0 0%,#ffe066 22%,#f5b400 50%,#a86b00 80%,#4a2e00 100%);animation:goldPulse 1.6s ease-in-out infinite}
+#enamres.gold .er-rays{display:block;position:fixed;left:50%;top:40%;width:220vmax;height:220vmax;margin:-110vmax 0 0 -110vmax;pointer-events:none;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.38) 0deg 7deg,rgba(255,255,255,0) 7deg 20deg);animation:raySpin 16s linear infinite}
+#enamres.gold .er-card{position:relative;overflow:hidden;background:linear-gradient(160deg,#fff7c9 0%,#ffd84a 40%,#e3a400 75%,#b8790a 100%);border-color:#fff;
+  box-shadow:0 0 0 4px #7a4f00,0 0 50px 10px rgba(255,230,120,.95),8px 8px 0 #4a2e00;animation:pop .45s steps(5)}
+#enamres.gold .er-card::after{content:"";position:absolute;top:-40%;bottom:-40%;left:-60%;width:35%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.85),transparent);transform:skewX(-20deg);animation:glint 1.6s ease-in-out infinite;pointer-events:none}
+#enamres.gold .er-hero{display:block;width:92px;height:92px;margin:0 auto 10px;border:5px solid #fff;box-shadow:0 0 0 4px #7a4f00,0 0 30px rgba(255,255,255,.9);animation:heroBob 1s ease-in-out infinite}
+#enamres.gold .er-sub{color:#5a3800}
+#enamres.gold #er-list{gap:4px}
+#enamres.gold .er-row{padding:4px 10px;background:rgba(255,255,255,.45);color:#3a2500;border-color:#a87400}
+#enamres.gold .er-row.ok{border-color:#1f8f45;background:rgba(255,255,255,.7)}
+#enamres.gold .er-row.ok em{color:#1f8f45}
+#enamres.gold .er-row.bad{border-color:#b33;background:rgba(255,255,255,.3)}
+#enamres.gold .er-score{color:#3a2500}
+#enamres.gold .er-verdict.win{color:#fff;text-shadow:3px 3px 0 #7a4f00,0 0 18px #fff}
+.er-big{display:inline-block;font-family:var(--pixel);font-size:clamp(28px,10vw,44px);line-height:1.15;
+  background:linear-gradient(90deg,#7a4f00,#fff6c2,#ffd700,#ffffff,#ffb300,#7a4f00);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(3px 3px 0 #4a2e00);animation:shimmer 1.4s linear infinite,pop .5s steps(5)}
+@keyframes shimmer{to{background-position:-250% 0}}
+@keyframes raySpin{to{transform:rotate(360deg)}}
+@keyframes goldPulse{50%{filter:brightness(1.12)}}
+@keyframes heroBob{50%{transform:translateY(-8px) rotate(-3deg)}}
+body.gold-win{background:radial-gradient(circle at 50% 25%,#fff3b0 0%,#f5c518 35%,#a86b00 75%,#3d2600 100%) fixed!important}
+body.gold-win #s-result{--surface:#fff3c4;--surface2:#ffe28a;--edge:#5a3800;--text:#2a1a00;--muted:#5a3a00;color:#2a1a00}
+@media (prefers-reduced-motion:reduce){#enamres.gold,#enamres.gold .er-rays,#enamres.gold .er-card::after,#enamres.gold .er-hero,.er-big{animation:none}}
 
 /* ---------- Legibilidade (fontes pixeladas) ---------- */
 body{font-synthesis:none;-webkit-font-smoothing:antialiased}
@@ -617,7 +646,9 @@ body,.qbox h2,.ans,.opt span span,.tip,.panel p,.box li,.logo p,.result p,.elo p
   <button class="back" onclick="closeCharDet()">◀ Escolher outro</button>
 </div></div>
 <div id="skillfx" aria-live="polite"></div>
-<div id="enamres" role="dialog" aria-label="Resultado do ENAM"><div class="er-card blk">
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div id="enamres" role="dialog" aria-label="Resultado do ENAM"><div class="er-rays" aria-hidden="true"></div><div class="er-card blk">
+  <img class="er-hero" id="er-hero" alt="">
   <div class="er-title">📜 RESULTADO DO ENAM</div><div class="er-sub">Exame Nacional de Antas Médias</div>
   <div id="er-list"></div><div class="er-score" id="er-score"></div><div class="er-verdict" id="er-verdict"></div>
   <button class="cta blk" id="er-ok">▶ CONTINUAR</button>
@@ -2588,7 +2619,7 @@ function typewrite(el,text){
     if(i>=text.length){clearInterval(twTimer);el.textContent=text;el.classList.remove("typing")}},20);
 }
 
-function go(id){if(id==="s-home"||id==="s-char")document.body.classList.remove("enem-mode");if((id==="s-char"||id==="s-home")&&(CURNAME==="over"||CURNAME==="party"))setTrack("main");if(id!=="s-q"){const b=document.getElementById("q-bar");if(b)b.classList.remove("on")}document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));document.body.classList.toggle("wide",id==="s-map"&&HORIZ);window.scrollTo(0,0);if(id==="s-home")showBest()}
+function go(id){if(id==="s-home"||id==="s-char")document.body.classList.remove("enem-mode","gold-win");if((id==="s-char"||id==="s-home")&&(CURNAME==="over"||CURNAME==="party"))setTrack("main");if(id!=="s-q"){const b=document.getElementById("q-bar");if(b)b.classList.remove("on")}document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));document.body.classList.toggle("wide",id==="s-map"&&HORIZ);window.scrollTo(0,0);if(id==="s-home")showBest()}
 function showBest(){let b=0;try{b=+localStorage.getItem("dde-jornada-best")||0}catch(e){}$("best").textContent=b?"RECORDE: "+pts(b):""}
 function toast(t){const el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove("on"),2600)}
 const hearts=()=>S.lives>6?"❤️×"+S.lives:"❤️".repeat(Math.max(0,S.lives))+"🖤".repeat(Math.max(0,3-S.lives));
@@ -3228,6 +3259,7 @@ function enamMark(i){
 }
 function enamReveal(){
   stopTimer();const R=S.enamRes||[],o=$("enamres"),list=$("er-list");
+  o.classList.remove("gold");$("er-hero").removeAttribute("src");document.querySelector(".er-title").textContent="📜 RESULTADO DO ENAM";
   const right=R.filter(r=>r.ok).length,pass=right>=6;
   list.innerHTML=R.map((r,k)=>`<div class="er-row" id="er${k}"><span>${r.ic}</span><b>${r.s}</b><em>?</em></div>`).join("");
   $("er-score").textContent="";$("er-verdict").textContent="";$("er-verdict").className="er-verdict";$("er-ok").style.visibility="hidden";
@@ -3237,11 +3269,56 @@ function enamReveal(){
   setTimeout(()=>{
     $("er-score").textContent=`${right}/10 acertos · mínimo 6`;
     const v=$("er-verdict");v.textContent=pass?"🎉 APROVADO NO ENAM!":"❌ REPROVADO NO ENAM";v.className="er-verdict "+(pass?"win":"lose");
-    if(pass){S.score+=right*base()*3*S.mult;flash("gold");sfx("win");burst(v,GOLDC,40);setTimeout(()=>burst(v,GOLDC,30),400)}
+    if(pass){S.score+=right*base()*3*S.mult;enamGlory(v)}
     else{flash("bad");shake();sfx("over")}
     const b=$("er-ok");b.textContent=pass?"🏆 VER MINHA VITÓRIA":"▶ CONTINUAR";b.style.visibility="visible";
-    b.onclick=()=>{o.classList.remove("on");if(!pass)S.lives=0;finish(pass?"win":"lose")};
+    b.onclick=()=>{o.classList.remove("on");if(!pass)S.lives=0;if(pass)document.body.classList.add("gold-win");finish(pass?"win":"lose");if(pass){confetti(5000);setTimeout(()=>confettiBurst(90),200)}};
   },900+R.length*520+900);
+}
+/* ---------- Êxtase dourado da aprovação no ENAM ---------- */
+function enamGlory(v){
+  const o=$("enamres");o.classList.add("gold");
+  document.querySelector(".er-title").innerHTML='<span class="er-big">APROVADO!</span>';
+  $("er-hero").src=IMGS[S.char.name].p;$("er-hero").alt=S.char.name;
+  v.textContent="🏆 "+S.char.name.toUpperCase()+" PASSOU NO ENAM!";
+  flash("gold");sfx("win");duckMusic(4);
+  playSeq([[72,.15,.12],[76,.27,.12],[79,.39,.12],[84,.51,.45,"square",.06],[79,.98,.1],[84,1.1,.9,"square",.06,.02],[88,1.1,.9,"triangle",.04],[91,1.1,.9,"triangle",.03]]);
+  for(let k=0;k<9;k++)setTimeout(()=>sfx("coin"),250+k*230);
+  confetti(9000);setTimeout(()=>confettiBurst(120),120);setTimeout(()=>confettiBurst(80),1300);
+  burst(v,GOLDC,40);setTimeout(()=>burst($("er-hero"),GOLDC,40),300);
+}
+let CFP=[],CFEND=0,CFRAF=0;
+const CFCOL=["#ffd700","#ffe680","#fff4c2","#f5b400","#ffcc33","#ffffff","#ff5a6a","#4dd2ff","#7dff8a","#c58cff"];
+function cfMake(burst){
+  const t=Math.random(),W=innerWidth,H=innerHeight;
+  return {x:burst?W/2+(Math.random()-.5)*W*.3:Math.random()*W,y:burst?H*.38:-20-Math.random()*H*.6,
+    vx:burst?(Math.random()-.5)*14:(Math.random()-.5)*1.6,vy:burst?-(Math.random()*11+4):Math.random()*2+1.5,
+    r:Math.random()*6.28,vr:(Math.random()-.5)*.35,s:Math.random()*6+6,k:t<.58?"c":t<.82?"o":"s",
+    col:CFCOL[Math.random()<.65?(Math.random()*5|0):(5+Math.random()*5|0)],ph:Math.random()*6.28};
+}
+function confetti(ms){
+  const c=$("confetti");if(!c)return;CFEND=performance.now()+(REDUCE?Math.min(ms,2500):ms);
+  const n=REDUCE?40:150;while(CFP.length<n)CFP.push(cfMake(false));
+  if(!CFRAF){c.style.display="block";cfLoop()}
+}
+function confettiBurst(n){if(REDUCE)n=Math.min(n,30);for(let i=0;i<n;i++)CFP.push(cfMake(true));confetti(Math.max(1500,CFEND-performance.now()))}
+function cfLoop(){
+  const c=$("confetti"),x=c.getContext("2d"),d=Math.min(2,devicePixelRatio||1),W=innerWidth,H=innerHeight;
+  if(c.width!==W*d||c.height!==H*d){c.width=W*d;c.height=H*d}
+  x.setTransform(d,0,0,d,0,0);x.clearRect(0,0,W,H);
+  const now=performance.now(),live=now<CFEND;
+  CFP=CFP.filter(p=>{
+    p.vy+=.12;p.vx*=.99;p.vy=Math.min(p.vy,5.5);p.x+=p.vx+Math.sin((now/600)+p.ph)*.6;p.y+=p.vy;p.r+=p.vr;
+    if(p.y>H+30){if(live){Object.assign(p,cfMake(false));p.y=-20}else return false}
+    x.save();x.translate(p.x,p.y);x.rotate(p.r);
+    if(p.k==="c"){x.scale(1,Math.cos(p.r*2));x.fillStyle=p.col;x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2)}
+    else if(p.k==="o"){const w=Math.abs(Math.cos(p.r))*p.s*.75+1.5;x.fillStyle="#b8860b";x.beginPath();x.ellipse(0,0,w,p.s*.75,0,0,6.28);x.fill();
+      x.fillStyle="#ffd700";x.beginPath();x.ellipse(0,0,Math.max(1,w-1.6),p.s*.75-1.6,0,0,6.28);x.fill();x.fillStyle="rgba(255,255,255,.7)";x.fillRect(-w*.3,-p.s*.4,Math.max(1,w*.25),p.s*.35)}
+    else{const a=.5+.5*Math.sin(now/90+p.ph);x.globalAlpha=a;x.fillStyle="#fffbe0";const r=p.s*.9;
+      x.beginPath();x.moveTo(0,-r);x.lineTo(r*.22,-r*.22);x.lineTo(r,0);x.lineTo(r*.22,r*.22);x.lineTo(0,r);x.lineTo(-r*.22,r*.22);x.lineTo(-r,0);x.lineTo(-r*.22,-r*.22);x.closePath();x.fill()}
+    x.restore();return true;
+  });
+  if(CFP.length){CFRAF=requestAnimationFrame(cfLoop)}else{CFRAF=0;x.clearRect(0,0,W,H);c.style.display="none"}
 }
 let starting=false;
 function startFx(btn){
